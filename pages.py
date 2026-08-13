@@ -905,17 +905,21 @@ class SettingsPage(ttk.Frame):
         for zagolovok, poyasnenie, klyuch, varianty in (
                 ("Градусы", "и температура железа, и погода",
                  "units.temp",
-                 [("c", "Цельсий", "thermo"), ("f", "Фаренгейт", "thermo")]),
+                 [("system", "Как в Windows", "windows"),
+                  ("c", "Цельсий", "thermo"), ("f", "Фаренгейт", "thermo")]),
                 ("Ветер", "и в окне, и в надписях на экране",
                  "units.wind",
-                 [("kmh", "км/ч", "sliders"), ("ms", "м/с", "sliders"),
+                 [("system", "Как в Windows", "windows"),
+                  ("kmh", "км/ч", "sliders"), ("ms", "м/с", "sliders"),
                   ("mph", "миль/ч", "sliders")]),
                 ("Часы", "двенадцать часов дописывают AM и PM",
                  "units.clock",
-                 [("24", "24 часа", "about"), ("12", "12 часов", "about")]),
+                 [("system", "Как в Windows", "windows"),
+                  ("24", "24 часа", "about"), ("12", "12 часов", "about")]),
                 ("Порядок чисел в дате", "день, месяц и год",
                  "units.date",
-                 [("dmy", "13.08.2026", "about"),
+                 [("system", "Как в Windows", "windows"),
+                  ("dmy", "13.08.2026", "about"),
                   ("mdy", "08/13/2026", "about"),
                   ("ymd", "2026-08-13", "about")]),
                 ("Неделя начинается", "по этому дню тема считает номер дня",
@@ -935,6 +939,11 @@ class SettingsPage(ttk.Frame):
         b = card.body
         ttk.Label(b, text="Как это будет выглядеть",
                   style="Card.Sub.TLabel").pack(anchor="w")
+        ttk.Label(b, text="по умолчанию всё берётся из самой Windows: "
+                          "какие единицы и форматы там выбраны, такие "
+                          "и здесь",
+                  style="Card.Faint.TLabel", wraplength=620,
+                  justify="left").pack(anchor="w", pady=(2, 0))
         self.units_lbl = ttk.Label(b, text="", style="Card.TLabel")
         self.units_lbl.pack(anchor="w", pady=(6, 0))
         ttk.Label(b, text="Тема может брать готовые {time}, {date} и {deg} — "

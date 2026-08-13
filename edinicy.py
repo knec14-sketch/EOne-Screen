@@ -28,7 +28,66 @@
 целиком и навсегда.
 """
 
+import sys
+import time
+
 import prefs
+
+IS_WINDOWS = sys.platform.startswith("win")
+
+# Что стоит в самой Windows. Читается из реестра и придерживается:
+# спрашивать систему на каждый кадр незачем, а меняют эти настройки
+# раз в жизни.
+_sistema = None
+_sistema_kogda = 0.0
+
+
+def _iz_windows():
+    """Единицы и форматы, выбранные в самой Windows.
+
+    iMeasure    0 - метрическая система, 1 - американская
+    sShortTime  строчная h - часы на двенадцать, прописная H - на 24
+    sShortDate  порядок букв d, M и y и есть порядок чисел в дате
+    """
+    global _sistema, _sistema_kogda
+    if _sistema is not None and time.time() - _sistema_kogda < 5.0:
+        return _sistema
+    itog = {"temp": "c", "wind": "kmh", "clock": "24", "date": "dmy"}
+    if IS_WINDOWS:
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                                r"Control Panel\International") as k:
+                def spros(imya):
+                    try:
+                        return str(winreg.QueryValueEx(k, imya)[0])
+                    except OSError:
+                        return ""
+                if spros("iMeasure") == "1":       # американская
+                    itog["temp"] = "f"
+                    itog["wind"] = "mph"
+                vremya = spros("sShortTime") or spros("sTimeFormat")
+                if "h" in vremya:                  # строчная - на двенадцать
+                    itog["clock"] = "12"
+                data = spros("sShortDate").lower()
+                poryadok = [z for z in data if z in "dmy"]
+                pervye = []
+                for z in poryadok:
+                    if z not in pervye:
+                        pervye.append(z)
+                itog["date"] = {"dmy": "dmy", "mdy": "mdy",
+                                "ymd": "ymd"}.get("".join(pervye), "dmy")
+        except Exception:
+            pass
+    _sistema, _sistema_kogda = itog, time.time()
+    return itog
+
+
+def _vybor(klyuch, svoy):
+    """Что выбрано: своё или то, что стоит в Windows."""
+    if str(svoy).lower() in ("system", "windows", ""):
+        return _iz_windows()[klyuch]
+    return svoy
 
 # Что человек читает как температуру. Всё остальное - числа как числа.
 GRADUSY_KLYUCHI = (
@@ -60,9 +119,9 @@ PORYADKI = {
 
 
 def shkala():
-    """Какая шкала выбрана: "c" или "f"."""
-    return "f" if str(prefs.get("units.temp", "c")).lower().startswith("f") \
-        else "c"
+    """Какая шкала выбрана: "c" или "f". По умолчанию - как в Windows."""
+    vid = _vybor("temp", prefs.get("units.temp", "system"))
+    return "f" if str(vid).lower().startswith("f") else "c"
 
 
 def znak():
@@ -79,7 +138,7 @@ def gradusy(c):
 
 def shkala_vetra():
     """В чём показывать ветер: "kmh", "ms" или "mph"."""
-    vid = str(prefs.get("units.wind", "kmh")).lower()
+    vid = str(_vybor("wind", prefs.get("units.wind", "system"))).lower()
     return vid if vid in VETER else "kmh"
 
 
@@ -97,7 +156,8 @@ def znak_vetra():
 
 def dvenadcat():
     """Часы на двенадцать, с AM и PM."""
-    return str(prefs.get("units.clock", "24")).startswith("12")
+    return str(_vybor("clock", prefs.get("units.clock", "system"))
+               ).startswith("12")
 
 
 def chasy(dt, sekundy=False):
@@ -110,7 +170,8 @@ def chasy(dt, sekundy=False):
 def data(dt, korotko=False, slovami=False):
     """Дата в выбранном порядке чисел."""
     dlinnaya, korotkaya, mesyacem = PORYADKI.get(
-        str(prefs.get("units.date", "dmy")).lower(), PORYADKI["dmy"])
+        str(_vybor("date", prefs.get("units.date", "system"))).lower(),
+        PORYADKI["dmy"])
     if slovami:
         return dt.strftime(mesyacem)
     return dt.strftime(korotkaya if korotko else dlinnaya)

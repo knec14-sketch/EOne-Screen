@@ -327,6 +327,10 @@ SLOVAR = {
     "с понедельника": "on Monday",
     "с воскресенья": "on Sunday",
     "Как это будет выглядеть": "How it will look",
+    "по умолчанию всё берётся из самой Windows: какие единицы и форматы "
+    "там выбраны, такие и здесь":
+        "by default everything is taken from Windows itself: whatever "
+        "units and formats are chosen there are used here",
     "Тема может брать готовые {time}, {date} и {deg} — они идут по этой "
     "настройке. А может писать свой вид через {now:…} — тогда настройка "
     "его не тронет.":
