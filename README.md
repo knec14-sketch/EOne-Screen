@@ -225,21 +225,6 @@ the sunrise is. You do not have to read somebody else's JSON by hand.
 
 ---
 
-## Units
-
-Degrees Celsius or Fahrenheit, wind in km/h, m/s or mph, a 24-hour clock
-or a 12-hour one with AM and PM, the order of the numbers in the date,
-which day the week starts on. The setting is shared: both the window and
-what goes to the screen follow it. A theme does not have to be rewritten —
-the engine changes the `°C` label to `°F` itself.
-
-Important: **only what is read gets converted**. The values a theme uses
-to drive the picture — the fill of a ring, a reaction to temperature —
-always stay in Celsius. Otherwise the choice of scale would shift every
-threshold in the theme.
-
----
-
 ## Language
 
 Russian and English, switched in the settings, applied on the next start.

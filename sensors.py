@@ -1732,8 +1732,9 @@ class Sensors:
                     rows.append(t("  все найденные датчики процессора:"))
                     for n in sorted(self.all_temps,
                                     key=lambda x: (temp_priority(x), x)):
-                        rows.append("     {:32s} {:5.1f}".format(
-                            n[:32], self.all_temps[n]))
+                        rows.append("     {:32s} {:5.1f} {}".format(
+                            n[:32], edinicy.gradusy(self.all_temps[n]),
+                            edinicy.znak()))
             else:
                 why = self.temp_note or "источник не найден"
                 rows.append(t("температура процессора: НЕТ — ") + t(why))

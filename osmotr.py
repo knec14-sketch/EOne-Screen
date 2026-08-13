@@ -28,6 +28,7 @@ import os
 import sys
 import time
 
+import edinicy
 import papka
 
 IS_WINDOWS = sys.platform.startswith("win")
@@ -288,7 +289,14 @@ def datchiki(zhdat=8.0, s=None):
         est[key] = bool(chitaetsya)
         if chitaetsya:
             try:
-                pojasnenie = "{:.1f}".format(float(znach))
+                # Температуру показываем в той шкале, которую человек
+                # выбрал: увидеть Цельсии там, где всюду Фаренгейт,
+                # он не ожидает.
+                if key.endswith("_temp"):
+                    pojasnenie = "{:.1f} {}".format(
+                        edinicy.gradusy(float(znach)), edinicy.znak())
+                else:
+                    pojasnenie = "{:.1f}".format(float(znach))
             except (TypeError, ValueError):
                 pojasnenie = str(znach)
             nahodki.append(Nahodka(True, imya, pojasnenie))

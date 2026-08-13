@@ -1057,6 +1057,13 @@ class SettingsPage(ttk.Frame):
         self.src = ttk.Label(lb, text="", style="Card.Faint.TLabel",
                              justify="left")
         self.src.pack(anchor="w", pady=(4, 8))
+        # Список сырой: по нему настраивают реакцию слоёв, а пороги
+        # реакции всегда в Цельсиях - иначе выбор шкалы сдвинул бы их все.
+        ttk.Label(lb, text="значения как есть, до перевода в выбранные "
+                           "единицы: температуры здесь всегда в Цельсиях, "
+                           "на них настраивается реакция слоёв",
+                  style="Card.Faint.TLabel", wraplength=620,
+                  justify="left").pack(anchor="w", pady=(0, 6))
         self.values = tk.Text(lb, height=16, relief="flat", bd=0,
                               highlightthickness=0, bg=lk.c["surface"],
                               fg=lk.c["text"], font=lk.font("mono"))

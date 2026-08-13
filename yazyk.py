@@ -385,6 +385,11 @@ SLOVAR = {
     "выключенный источник не опрашивается вообще — это и есть экономия":
         "a source that is off is not polled at all — that is the saving",
     "Что читается прямо сейчас": "What is being read right now",
+    "значения как есть, до перевода в выбранные единицы: температуры "
+    "здесь всегда в Цельсиях, на них настраивается реакция слоёв":
+        "the values as they are, before conversion into the chosen units: "
+        "temperatures here are always in Celsius, layer reactions are set "
+        "on them",
     "Процессор, память, диски, сеть": "Processor, memory, disks, network",
     "почти бесплатно": "almost free",
     "Видеокарта": "Graphics card",
