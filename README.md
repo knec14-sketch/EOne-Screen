@@ -95,6 +95,11 @@ about every finding.
 Then `app.bat` opens the window. It is laid out simply: three sections
 at the top.
 
+**Every day after that — from the shortcut.** In the settings, section
+**Startup**, tick «A shortcut on the desktop»: the program makes one
+with its own icon, and it starts the same way `app.bat` does, with the
+rights. After that neither the folder nor the command line is needed.
+
 ### Home
 
 Here you see the same thing that goes to the water-cooler screen, only
