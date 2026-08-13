@@ -1,0 +1,70 @@
+EOne screen
+Copyright (c) 2026 EOne
+
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+(CC BY-NC-SA 4.0)
+
+
+IN SHORT
+--------
+You may use, copy and rework this. You may not make money from it.
+What you rework goes out on the same terms.
+
+These terms cover everything in this folder: the code of the program,
+the «Weater Space» theme together with its frames and effects, and the
+reference document.
+
+
+WHAT IS ALLOWED
+---------------
+  * copying the program and passing it on in any form and on any medium;
+  * reworking it, adding to it, taking pieces and building your own
+    on top of them.
+
+The permission has no time limit and cannot be revoked — as long as
+the terms below are kept.
+
+
+TERMS
+-----
+ATTRIBUTION (BY). Name the author — EOne — give a link to the licence,
+and say whether you changed anything. You may do this in any reasonable
+way, but not in a way that suggests the author endorses you or your work.
+
+NONCOMMERCIAL (NC). The material may not be used for commercial gain or
+monetary reward: not sold, not built into a paid product, not shipped
+with goods. For permission to use it commercially, write to the author.
+
+SHAREALIKE (SA). If you rework the material, give out the result under
+this same licence — CC BY-NC-SA 4.0.
+
+NO ADDITIONAL RESTRICTIONS. You may not put legal or technical
+restrictions on others that stop them doing what the licence allows.
+
+
+WHAT BELONGS TO OTHERS
+----------------------
+The LibreHardwareMonitor library (the four .dll files in the program
+folder) belongs to its authors and is distributed under its own licence,
+MPL 2.0. This licence does not cover it.
+
+Fonts, the Windows icons and the forecast data belong to their owners.
+
+
+NO WARRANTY
+-----------
+The program is given as it is. The author does not promise that it fits
+your task, and is not answerable for what comes of running it — including
+the behaviour of the connected screen and the sensor readings.
+
+
+THE FULL TEXT
+-------------
+The above is a retelling for a human being, not the licence itself.
+Legal force belongs to the full text:
+
+  https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+A short summary in plain language:
+
+  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en

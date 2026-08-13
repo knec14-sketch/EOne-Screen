@@ -1,0 +1,2676 @@
+{
+  "screen": {
+    "width": 960,
+    "height": 480,
+    "fps": 30,
+    "quality": 85,
+    "brightness": 100,
+    "supersample": 2,
+    "background": "#16365f",
+    "background_day": "#67a8e9",
+    "transition_seconds": 10,
+    "day_mode": "night",
+    "pack_frames": true,
+    "background2": "#000000",
+    "background_gradient": "diag"
+  },
+  "layers": [
+    {
+      "type": "rect",
+      "name": "небо · глубина",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fill": "#3f86d8",
+      "fill2": "#bfe0f5",
+      "gradient": "v",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.85
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "солнце · дальний ореол",
+      "x": -110,
+      "y": -130,
+      "w": 420,
+      "h": 420,
+      "fill": "#ffe9a8",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.5
+        }
+      },
+      "day": {
+        "x": -54,
+        "y": -127
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "солнце · ближний ореол",
+      "x": -40,
+      "y": -60,
+      "w": 230,
+      "h": 230,
+      "fill": "#fff3cd",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.65
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "солнце",
+      "x": 24,
+      "y": 6,
+      "w": 74,
+      "h": 74,
+      "fill": "#fffbe8",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.95
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "name": "пелена · пасмурно",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fill": "#2b323c",
+      "fill2": "#141922",
+      "gradient": "v",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_grey",
+        "from": 0.25,
+        "to": 0.9,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.72
+        }
+      },
+      "day": {
+        "fill": "#8b96a4",
+        "fill2": "#c3ccd6"
+      }
+    },
+    {
+      "type": "rect",
+      "name": "гроза · тьма",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fill": "#1a2230",
+      "fill2": "#3d4657",
+      "gradient": "v",
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_storm",
+        "from": 0.3,
+        "to": 0.85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.78
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 1·1",
+      "x": 120,
+      "y": 330,
+      "w": 120,
+      "h": 46,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 46,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 153
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.6
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 1·2",
+      "x": 172,
+      "y": 314,
+      "w": 96,
+      "h": 52,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 46,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 205
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.67
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 1·3",
+      "x": 224,
+      "y": 336,
+      "w": 84,
+      "h": 40,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 46,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 257
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.68
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 2·1",
+      "x": 620,
+      "y": 60,
+      "w": 102,
+      "h": 39,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 38,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 648
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.75
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 2·2",
+      "x": 664,
+      "y": 47,
+      "w": 81,
+      "h": 44,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 38,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 692
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.63
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 2·3",
+      "x": 708,
+      "y": 65,
+      "w": 71,
+      "h": 34,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 38,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 736
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.65
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 3·1",
+      "x": 330,
+      "y": 430,
+      "w": 84,
+      "h": 32,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 68,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 362
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.65
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 3·2",
+      "x": 366,
+      "y": 419,
+      "w": 67,
+      "h": 36,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 68,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 398
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.65
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 3·3",
+      "x": 402,
+      "y": 434,
+      "w": 58,
+      "h": 28,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 68,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 434
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.61
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 4·1",
+      "x": 830,
+      "y": 250,
+      "w": 72,
+      "h": 27,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 47,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 883
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.56
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 4·2",
+      "x": 861,
+      "y": 241,
+      "w": 57,
+      "h": 31,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 47,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 914
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.54
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "облако 4·3",
+      "x": 892,
+      "y": 253,
+      "w": 50,
+      "h": 24,
+      "fill": "#ffffff",
+      "loop": {
+        "seconds": 47,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "x": 945
+        },
+        "fps": 5
+      },
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_day",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.76
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 3",
+      "x": 69,
+      "y": 52,
+      "w": 4,
+      "h": 4,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 5.1,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.19
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.29
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 4",
+      "x": 239,
+      "y": 34,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 2.8,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.06
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.45
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 7",
+      "x": 146,
+      "y": 129,
+      "w": 6,
+      "h": 6,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 6.8,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.14
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.53
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 8",
+      "x": 426,
+      "y": 40,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 6.4,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.09
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.27
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 9",
+      "x": 167,
+      "y": 291,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 5.0,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.15
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.51
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 10",
+      "x": 125,
+      "y": 312,
+      "w": 4,
+      "h": 4,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 4.2,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.13
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.54
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 11",
+      "x": 84,
+      "y": 303,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 4.7,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.13
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.53
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 15",
+      "x": 326,
+      "y": 142,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 3.6,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.14
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.56
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 17",
+      "x": 916,
+      "y": 190,
+      "w": 6,
+      "h": 6,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 5.2,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.06
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.45
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 19",
+      "x": 188,
+      "y": 402,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 4.7,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.06
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.32
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 23",
+      "x": 916,
+      "y": 433,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 4.1,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.12
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.4
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 25",
+      "x": 90,
+      "y": 445,
+      "w": 2,
+      "h": 2,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 4.6,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.15
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.68
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "звезда 26",
+      "x": 82,
+      "y": 389,
+      "w": 6,
+      "h": 6,
+      "fill": "#cfe4ff",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 5.1,
+        "mode": "pingpong",
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to": {
+          "opacity": 0.15
+        },
+        "fps": 10
+      },
+      "react": {
+        "value": "sky_night",
+        "from": 0.5,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.39
+        }
+      }
+    },
+    {
+      "type": "ellipse",
+      "name": "ореол вокруг луны",
+      "x": 560,
+      "y": 30,
+      "w": 420,
+      "h": 420,
+      "fill": "#3a3a3a",
+      "opacity": 0.0,
+      "fill2": "#000000",
+      "gradient": "diag",
+      "react": {
+        "value": "sky_night",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.5
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "туман",
+      "src": "эффекты/tuman",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 6,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_fog",
+        "from": 0.15,
+        "to": 0.85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.95
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "дождь",
+      "src": "эффекты/dozhd",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 14,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_rain",
+        "from": 0.15,
+        "to": 0.85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.85
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "снег тихий",
+      "src": "эффекты/sneg",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 8,
+      "opacity": 0.0,
+      "react": {
+        "value": "snow_calm",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "резко",
+        "ease_out": "резко",
+        "to_state": {
+          "opacity": 0.9
+        },
+        "ease_mid": "резко"
+      }
+    },
+    {
+      "type": "image",
+      "name": "метель",
+      "src": "эффекты/metel",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 18,
+      "opacity": 0.0,
+      "react": {
+        "value": "snow_windy",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "резко",
+        "ease_out": "резко",
+        "to_state": {
+          "opacity": 0.95
+        },
+        "ease_mid": "резко"
+      }
+    },
+    {
+      "type": "image",
+      "name": "метеоры",
+      "src": "эффекты/meteor",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 25,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_night",
+        "from": 0.0,
+        "to": 0.45,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.85
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 10,
+      "y": 23,
+      "anchor": "lm",
+      "text": "{gpu_name}",
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "size": 20,
+      "outline": "#ffffff",
+      "name": "name gpu",
+      "day": {
+        "x": -303,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 1263,
+      "y": 23,
+      "anchor": "rm",
+      "text": "{gpu_name}",
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "size": 20,
+      "outline": "#1b1b1b",
+      "name": "name gpu · день",
+      "day": {
+        "x": 950,
+        "opacity": 1.0,
+        "color": "#12314f",
+        "outline": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "ring",
+      "x": 176,
+      "y": 125,
+      "gap_at": "top",
+      "gap": 84,
+      "value": "gpu_load",
+      "min": 0,
+      "max": 100,
+      "fill": "#2f6bff",
+      "cap": "round",
+      "back": "#808080",
+      "r": 110,
+      "thickness": 25,
+      "name": "gpu bar",
+      "day": {
+        "x": -162,
+        "opacity": 0.0,
+        "fill": "#1b6fd6",
+        "fill2": "#7cc4ff",
+        "back": "#e3ecf5"
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "fill2": "#7ad4ff",
+      "gradient": "h"
+    },
+    {
+      "type": "ring",
+      "x": 1122,
+      "y": 125,
+      "gap_at": "top",
+      "gap": 84,
+      "value": "gpu_load",
+      "min": 0,
+      "max": 100,
+      "fill": "#0000a0",
+      "cap": "round",
+      "back": "#1b1b1b",
+      "r": 110,
+      "thickness": 25,
+      "name": "gpu bar · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "back": "#e3ecf5",
+        "fill": "#1b6fd6",
+        "fill2": "#7cc4ff"
+      },
+      "reverse": true,
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 176,
+      "y": 125,
+      "anchor": "mm",
+      "text": "{gpu_temp:.0f}°C",
+      "font": "Project Space.ttf",
+      "color": "#2f6bff",
+      "size": 32,
+      "outline": "#2f6bff",
+      "outline_width": 1,
+      "name": "gpu temp",
+      "day": {
+        "x": -164,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "gpu_temp",
+        "from": 55,
+        "to": 80,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "size": 33,
+          "color": "#ff5a3c",
+          "outline": "#ff5a3c"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 1125,
+      "y": 125,
+      "anchor": "mm",
+      "text": "{gpu_temp:.0f}°C",
+      "font": "Project Space.ttf",
+      "color": "#0000a0",
+      "size": 30,
+      "outline": "#0000a0",
+      "outline_width": 1,
+      "name": "gpu temp · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "color": "#1b6fd6",
+        "outline": "#1b6fd6"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "gpu_temp",
+        "from": 55,
+        "to": 80,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "size": 33,
+          "color": "#ff5a3c",
+          "outline": "#ff5a3c"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 176,
+      "y": 46,
+      "anchor": "mm",
+      "text": "{gpu_load:.0f}%",
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "name": "gpu load%",
+      "day": {
+        "x": -118,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "size": 25
+    },
+    {
+      "type": "text",
+      "x": 1078,
+      "y": 46,
+      "anchor": "mm",
+      "text": "{gpu_load:.0f}%",
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "size": 20,
+      "name": "gpu load% · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "ring",
+      "x": 176,
+      "y": 356,
+      "gap_at": "bottom",
+      "gap": 84,
+      "reverse": true,
+      "value": "cpu_load",
+      "min": 0,
+      "max": 100,
+      "fill": "#ff2b2b",
+      "cap": "round",
+      "back": "#808080",
+      "r": 110,
+      "thickness": 25,
+      "name": "cpu load bar",
+      "day": {
+        "x": -162,
+        "opacity": 0.0,
+        "fill": "#d92f2f",
+        "fill2": "#ff9a5c",
+        "back": "#e3ecf5"
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "fill2": "#ff9d3d",
+      "gradient": "h"
+    },
+    {
+      "type": "ring",
+      "x": 1122,
+      "y": 356,
+      "gap_at": "bottom",
+      "gap": 84,
+      "reverse": false,
+      "value": "cpu_load",
+      "min": 0,
+      "max": 100,
+      "fill": "#a80000",
+      "cap": "round",
+      "back": "#1b1b1b",
+      "r": 110,
+      "thickness": 25,
+      "name": "cpu load bar · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "back": "#e3ecf5",
+        "fill": "#d92f2f",
+        "fill2": "#ff9a5c"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "y": 352,
+      "anchor": "mm",
+      "text": "{cpu_temp:.0f}°C",
+      "font": "Project Space.ttf",
+      "color": "#ff2b2b",
+      "x": 176,
+      "size": 32,
+      "outline": "#ff2b2b",
+      "outline_width": 1,
+      "name": "temp cpu",
+      "day": {
+        "x": -164,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "cpu_temp",
+        "from": 60,
+        "to": 85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "size": 33,
+          "color": "#ff5a3c",
+          "outline": "#ff5a3c"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "y": 352,
+      "anchor": "mm",
+      "text": "{cpu_temp:.0f}°C",
+      "font": "Project Space.ttf",
+      "color": "#a80000",
+      "x": 1125,
+      "size": 30,
+      "outline": "#a80000",
+      "outline_width": 1,
+      "name": "temp cpu · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "color": "#d92f2f",
+        "outline": "#d92f2f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "cpu_temp",
+        "from": 60,
+        "to": 85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "size": 33,
+          "color": "#ff5a3c",
+          "outline": "#ff5a3c"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 176,
+      "y": 432,
+      "anchor": "mm",
+      "text": "{cpu_load:.0f}%",
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "size": 25,
+      "name": "load cpu%",
+      "day": {
+        "x": -118,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 1078,
+      "y": 432,
+      "anchor": "mm",
+      "text": "{cpu_load:.0f}%",
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "size": 20,
+      "name": "load cpu% · день",
+      "day": {
+        "x": 784,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 10,
+      "y": 456,
+      "anchor": "lm",
+      "text": "{cpu_name}",
+      "font": "Project Space.ttf",
+      "size": 20,
+      "color": "#808080",
+      "name": "name cpu",
+      "day": {
+        "x": -291,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 1273,
+      "y": 456,
+      "anchor": "rm",
+      "text": "{cpu_name}",
+      "font": "Project Space.ttf",
+      "size": 20,
+      "color": "#1b1b1b",
+      "name": "name cpu · день",
+      "day": {
+        "x": 950,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "name": "дата",
+      "type": "text",
+      "x": 808,
+      "anchor": "mm",
+      "text": "{now:%d.%m}",
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "size": 50,
+      "y": 80,
+      "day": {
+        "x": 1143,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "name": "дата · день",
+      "type": "text",
+      "x": -183,
+      "anchor": "mm",
+      "text": "{now:%d.%m}",
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "size": 50,
+      "y": 80,
+      "day": {
+        "x": 152,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 808,
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "anchor": "mm",
+      "size": 20,
+      "name": "date",
+      "text": "date",
+      "y": 38,
+      "day": {
+        "x": 1021,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": -60,
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "anchor": "mm",
+      "size": 20,
+      "name": "date · день",
+      "text": "date",
+      "y": 38,
+      "day": {
+        "x": 152,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "name": "время",
+      "type": "text",
+      "anchor": "mm",
+      "text": "{now:%H:%M}",
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "size": 50,
+      "x": 808,
+      "y": 400,
+      "day": {
+        "x": 1143,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "name": "время · день",
+      "type": "text",
+      "anchor": "mm",
+      "text": "{now:%H:%M}",
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "size": 50,
+      "x": -183,
+      "y": 400,
+      "day": {
+        "x": 152,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 808,
+      "y": 442,
+      "font": "Project Space.ttf",
+      "color": "#808080",
+      "anchor": "mm",
+      "name": "time",
+      "text": "time",
+      "size": 20,
+      "day": {
+        "x": 1021,
+        "opacity": 0.0
+      },
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": -60,
+      "y": 442,
+      "font": "Project Space.ttf",
+      "color": "#1b1b1b",
+      "anchor": "mm",
+      "name": "time · день",
+      "text": "time",
+      "size": 20,
+      "day": {
+        "x": 152,
+        "opacity": 1.0,
+        "color": "#12314f"
+      },
+      "opacity": 0.0,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "name": "луна поверх всего (PNG с альфа-каналом из DaVinci)",
+      "type": "image",
+      "src": "luna-raw",
+      "fit": "none",
+      "x": 376,
+      "y": 54,
+      "w": 375,
+      "h": 371,
+      "day": {
+        "x": 977,
+        "opacity": 0.0
+      },
+      "anim": {
+        "ease_in": "плавно",
+        "ease_mid": "резко",
+        "ease_out": "плавно",
+        "end": 0.55
+      },
+      "premultiplied": true,
+      "fps": 30
+    },
+    {
+      "type": "image",
+      "src": "zemlya-raw",
+      "fit": "none",
+      "name": "земля",
+      "x": -374,
+      "premultiplied": true,
+      "y": 56,
+      "opacity": 0.0,
+      "day": {
+        "x": 202,
+        "opacity": 1.0
+      },
+      "anim": {
+        "ease_in": "плавно",
+        "ease_mid": "резко",
+        "ease_out": "плавно",
+        "start": 0.45
+      },
+      "fps": 30
+    },
+    {
+      "type": "text",
+      "x": 951,
+      "y": 221,
+      "text": "{now:%A}",
+      "font": "Project Space.ttf",
+      "size": 40,
+      "color": "#ffffff",
+      "anchor": "rm",
+      "name": "day",
+      "day": {
+        "x": 1813
+      },
+      "outline": "#000000",
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": -853,
+      "y": 220,
+      "text": "{now:%A}",
+      "font": "Project Space.ttf",
+      "size": 40,
+      "color": "#ffffff",
+      "anchor": "lm",
+      "name": "day · день",
+      "day": {
+        "x": 9,
+        "y": 221,
+        "color": "#12314f",
+        "outline": "#fff",
+        "outline_width": 2
+      },
+      "outline": "#000000",
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      }
+    },
+    {
+      "type": "text",
+      "x": 949,
+      "y": 270,
+      "text": "{weather_full} {weather_temp:.0f} °C",
+      "font": "Project Space.ttf",
+      "color": "#ffffff",
+      "anchor": "rm",
+      "size": 25,
+      "name": "weather",
+      "day": {
+        "x": 2203
+      },
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "outline": "#000000",
+      "react": {
+        "value": "sky_frost",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "color": "#7ec8ff",
+          "outline": "#7ec8ff"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 949,
+      "y": 270,
+      "text": "{weather_full} {weather_temp:.0f} °C",
+      "font": "Project Space.ttf",
+      "color": "#ff6a3d",
+      "anchor": "rm",
+      "size": 25,
+      "name": "weather · жара",
+      "day": {
+        "x": 2203
+      },
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "outline": "#ff6a3d",
+      "react": {
+        "value": "sky_heat",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 1.0,
+          "color": "#ff6a3d",
+          "outline": "#ff6a3d"
+        }
+      },
+      "opacity": 0.0
+    },
+    {
+      "type": "text",
+      "x": -1243,
+      "y": 270,
+      "text": "{weather_full} {weather_temp:.0f} °C",
+      "font": "Project Space.ttf",
+      "color": "#ffffff",
+      "anchor": "lm",
+      "size": 25,
+      "name": "weather · день",
+      "day": {
+        "x": 11,
+        "y": 269,
+        "color": "#12314f",
+        "outline": "#fff",
+        "outline_width": 2
+      },
+      "outline": "#000000",
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "sky_frost",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "color": "#7ec8ff",
+          "outline": "#7ec8ff"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": -1243,
+      "y": 270,
+      "text": "{weather_full} {weather_temp:.0f} °C",
+      "font": "Project Space.ttf",
+      "color": "#ff6a3d",
+      "anchor": "lm",
+      "size": 25,
+      "name": "weather · день · жара",
+      "day": {
+        "x": 11,
+        "y": 269,
+        "outline_width": 2
+      },
+      "outline": "#ff6a3d",
+      "outline_width": 1,
+      "anim": {
+        "start": 0.0,
+        "end": 0.88,
+        "ease_in": "плавно",
+        "ease_mid": "средне",
+        "ease_out": "плавно"
+      },
+      "react": {
+        "value": "sky_heat",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 1.0,
+          "color": "#ff6a3d",
+          "outline": "#ff6a3d"
+        }
+      },
+      "opacity": 0.0
+    },
+    {
+      "type": "line",
+      "name": "молния 1·1",
+      "x": 214,
+      "y": 372,
+      "x2": 222,
+      "y2": 396,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 0.9,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 1·2",
+      "x": 222,
+      "y": 396,
+      "x2": 214,
+      "y2": 421,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 0.9,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 1·3",
+      "x": 214,
+      "y": 421,
+      "x2": 215,
+      "y2": 446,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 0.9,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 1·4",
+      "x": 215,
+      "y": 446,
+      "x2": 214,
+      "y2": 470,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 0.9,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 2·1",
+      "x": 699,
+      "y": 95,
+      "x2": 694,
+      "y2": 134,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 1.5,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 2·2",
+      "x": 694,
+      "y": 134,
+      "x2": 702,
+      "y2": 174,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 1.5,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 2·3",
+      "x": 702,
+      "y": 174,
+      "x2": 694,
+      "y2": 213,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 1.5,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 2·4",
+      "x": 694,
+      "y": 213,
+      "x2": 678,
+      "y2": 252,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 1.5,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 4·1",
+      "x": 886,
+      "y": 273,
+      "x2": 884,
+      "y2": 315,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 3.1,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 4·2",
+      "x": 884,
+      "y": 315,
+      "x2": 868,
+      "y2": 358,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 3.1,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 4·3",
+      "x": 868,
+      "y": 358,
+      "x2": 853,
+      "y2": 400,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 3.1,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния 4·4",
+      "x": 853,
+      "y": 400,
+      "x2": 860,
+      "y2": 442,
+      "width": 2,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 3.1,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 0.9
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 1·1",
+      "x": 300,
+      "y": -70,
+      "x2": 287,
+      "y2": 70,
+      "width": 7,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 15.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 1·2",
+      "x": 287,
+      "y": 70,
+      "x2": 290,
+      "y2": 210,
+      "width": 5,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 15.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 1·3",
+      "x": 290,
+      "y": 210,
+      "x2": 327,
+      "y2": 350,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 15.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 1·4",
+      "x": 327,
+      "y": 350,
+      "x2": 304,
+      "y2": 490,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 15.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 2·1",
+      "x": 630,
+      "y": -70,
+      "x2": 617,
+      "y2": 70,
+      "width": 7,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 21.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 2·2",
+      "x": 617,
+      "y": 70,
+      "x2": 620,
+      "y2": 210,
+      "width": 5,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 21.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 2·3",
+      "x": 620,
+      "y": 210,
+      "x2": 657,
+      "y2": 350,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 21.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 2·4",
+      "x": 657,
+      "y": 350,
+      "x2": 634,
+      "y2": 490,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 21.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 3·1",
+      "x": 920,
+      "y": -70,
+      "x2": 907,
+      "y2": 70,
+      "width": 7,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 28.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 3·2",
+      "x": 907,
+      "y": 70,
+      "x2": 910,
+      "y2": 210,
+      "width": 5,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 28.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 3·3",
+      "x": 910,
+      "y": 210,
+      "x2": 947,
+      "y2": 350,
+      "width": 4,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 28.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "line",
+      "name": "молния главная 3·4",
+      "x": 947,
+      "y": 350,
+      "x2": 924,
+      "y2": 490,
+      "width": 3,
+      "fill": "#fdf6c8",
+      "cap": "round",
+      "opacity": 0.0,
+      "loop": {
+        "seconds": 28.0,
+        "mode": "pingpong",
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "when": {
+          "value": "sky_storm",
+          "from": 0.3,
+          "to": 0.8
+        },
+        "to": {
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "зной",
+      "src": "эффекты/znoy",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 12,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_heat",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "to_state": {
+          "opacity": 0.85
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "капли на стекле",
+      "src": "эффекты/kapli",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 10,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_rain",
+        "from": 0.2,
+        "to": 0.85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "снежинки на стекле",
+      "src": "эффекты/snezhinki",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 7,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_snow",
+        "from": 0.2,
+        "to": 0.85,
+        "ease_in": "плавно",
+        "ease_out": "плавно",
+        "to_state": {
+          "opacity": 0.75
+        }
+      }
+    },
+    {
+      "type": "image",
+      "name": "изморозь",
+      "src": "эффекты/izmoroz",
+      "x": 0,
+      "y": 0,
+      "w": 960,
+      "h": 480,
+      "fit": "none",
+      "fps": 8,
+      "opacity": 0.0,
+      "react": {
+        "value": "sky_frost",
+        "from": 0.0,
+        "to": 1.0,
+        "ease_in": "резко",
+        "ease_mid": "резко",
+        "ease_out": "резко",
+        "to_state": {
+          "opacity": 0.75
+        }
+      }
+    }
+  ],
+  "meta": {
+    "name": "Skywatch",
+    "author": "EOne",
+    "description": "продам гараж"
+  }
+}
