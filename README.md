@@ -157,8 +157,8 @@ screen in the middle, the properties of the chosen layer on the right.
 
 ![The editor](snimki/editor.png)
 
-The full description of every field is in the reference,
-[«Панель - справочник.md»](Панель%20-%20справочник.md) (in Russian).
+Every field of a theme can be set here; the editor shows what each
+one does as you hover over it.
 
 ### Settings
 
