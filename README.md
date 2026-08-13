@@ -55,31 +55,38 @@ are optional: without `pythonnet` there is no processor temperature,
 without `pystray` no icon next to the clock, without `numpy` the soft
 colour transitions are worked out more slowly.
 
-Then:
-
-```
-start.bat
-```
-
-It raises administrator rights, clears the «downloaded from the
-internet» mark off the files, and looks the machine over: which sensors
-answer, whether the screen is visible on a COM port, whether there is
-internet and whether the weather service replies. Everything it finds
-goes into `settings.json`, so it is not searched for again on every
-start.
-
-After that, the normal way to run it:
+Then just start it:
 
 ```
 app.bat
 ```
 
+It asks Windows for administrator rights and opens the window. On the
+first run the program looks the machine over by itself — which sensors
+answer, whether the screen is visible on a COM port, whether there is
+internet and whether the weather service replies — and says what is
+missing and what to do about it. The same page lives in the settings,
+section **Looking the machine over**, and can be opened at any time.
+
 The rights are needed for exactly one thing — the processor temperature:
 Windows does not let ordinary programs read the processor registers.
 Everything else works without them.
 
-The «A shortcut on the desktop» box in the settings makes a shortcut
-that starts the program with the rights.
+**Then — from the shortcut.** In the settings, section **Startup**, tick
+«A shortcut on the desktop»: the program makes one with its own icon,
+and it starts the same way, with the rights. After that neither the
+folder nor the command line is needed.
+
+### When `start.bat` is needed
+
+Only for one thing the window cannot do: Windows marks files downloaded
+from the internet, and while that mark is on the `.dll` files, .NET
+refuses to load the sensor library. `start.bat` strips the mark and then
+does the same looking-over in the console.
+
+If the machine checkup says the library is «marked as downloaded from
+the internet» — run `start.bat` once. Otherwise it is not needed at
+all.
 
 ---
 
@@ -87,18 +94,12 @@ that starts the program with the rights.
 
 ### The first run
 
-`start.bat` looks the machine over and says what is missing: libraries,
-rights, the screen on the port, the internet. It is worth reading its
-output in full — it is written in plain language and says what to do
-about every finding.
+The program looks the machine over itself and shows what it found:
+libraries, rights, the sensor library files, the hardware, the sensors,
+the screen on the port, the weather. Next to every trouble it says what
+to do, and where a press is enough there is a button.
 
-Then `app.bat` opens the window. It is laid out simply: three sections
-at the top.
-
-**Every day after that — from the shortcut.** In the settings, section
-**Startup**, tick «A shortcut on the desktop»: the program makes one
-with its own icon, and it starts the same way `app.bat` does, with the
-rights. After that neither the folder nor the command line is needed.
+The window is laid out simply: three sections at the top.
 
 ### Home
 
