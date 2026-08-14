@@ -1,6 +1,6 @@
 [Русский](README.ru.md) · **English**
 
-# EOne screen
+# EOne screen — an open replacement for the Jungle Leopard stock software
 
 An open replacement for the stock software of the **Jungle Leopard Pro
 Flow 360** water-cooler screen (TXW818 controller, ST7701S panel,
