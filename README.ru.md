@@ -1,6 +1,6 @@
 **Русский** · [English](README.md)
 
-# EOne screen
+# EOne screen — открытая замена штатной программе Jungle Leopard
 
 Открытая замена штатной программе для экрана водянки **Jungle Leopard Pro Flow 360**
 (контроллер TXW818, панель ST7701S, 960×480, по COM-порту).
