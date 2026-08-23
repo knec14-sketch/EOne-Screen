@@ -43,6 +43,7 @@ from yazyk import t
 
 import edinicy
 import papka
+import sistema
 
 
 IS_WINDOWS = sys.platform.startswith("win")
@@ -236,7 +237,9 @@ def cpu_name():
     if "cpu" in _names:
         return _names["cpu"]
     got = ""
-    if IS_WINDOWS:
+    if sistema.LINUX:
+        got = sistema.imya_processora() or ""
+    elif IS_WINDOWS:
         # В реестре имя лежит готовым, и читается оно мгновенно -
         # ни PowerShell, ни сторонних библиотек не нужно.
         try:
@@ -263,6 +266,8 @@ def gpu_name():
     got = _run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"])
     if got and got.strip():
         got = got.strip().splitlines()[0]
+    elif sistema.LINUX:
+        got = sistema.imya_videokarty() or ""
     elif IS_WINDOWS:
         # У ноутбуков карт бывает две; берём ту, у которой больше памяти -
         # это и есть игровая, а не встроенная в процессор
@@ -1254,6 +1259,8 @@ class Sensors:
         2. Через WMI, если запущена сама LibreHardwareMonitor или
            OpenHardwareMonitor. Дороже, потому что дёргает PowerShell.
         """
+        if sistema.LINUX:
+            return self._loop_temps_linux()
         if not IS_WINDOWS:
             return
         if self._try_direct_lhm():
@@ -1495,6 +1502,28 @@ class Sensors:
             self._stop.wait(self.plan["temps"][1])
 
     # --- способ 2: через WMI -------------------------------------------
+
+    def _loop_temps_linux(self):
+        """Температуры на Linux: их выкладывает само ядро.
+
+        Ни библиотеки датчиков, ни прав администратора не нужно -
+        читаем /sys/class/hwmon, разбор лежит в sistema.temperatury.
+        """
+        self.temp_source = "ядро Linux"
+        while not self._stop.wait(self.plan["temps"][1]):
+            got = sistema.temperatury() or {}
+            vals = {}
+            if "процессор" in got:
+                vals["cpu_temp"] = round(float(got["процессор"]), 1)
+                self.has_lhm = True          # источник температур найден
+                self.temp_sensor = "hwmon"
+            if "видеокарта" in got and not self.has_nvidia:
+                vals["gpu_temp"] = round(float(got["видеокарта"]), 1)
+            if vals:
+                self._set(**vals)
+            elif not self.temp_note:
+                self.temp_note = ("ядро не отдаёт температур: "
+                                  "нет /sys/class/hwmon")
 
     def _loop_temps_wmi(self):
         namespaces = ["root/LibreHardwareMonitor", "root/OpenHardwareMonitor"]

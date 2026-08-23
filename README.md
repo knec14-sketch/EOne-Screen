@@ -176,6 +176,42 @@ nothing needs restarting.
 
 ---
 
+## Linux
+
+Work in progress, and it needs a tester.
+
+Everything that does not depend on the system is already portable: the
+drawing engine, the screen protocol (the device is found by its USB
+vendor/product id, so it should turn up as `/dev/ttyACM*`), the weather,
+the themes, the editor, and the readings that come from `psutil`.
+
+Everything that does depend on the system lives in one file,
+`sistema.py`:
+
+| | Windows | Linux |
+|---|---|---|
+| temperatures | LibreHardwareMonitor, needs admin rights | `/sys/class/hwmon`, no rights needed |
+| processor name | registry | `/proc/cpuinfo` |
+| graphics card name | WMI | `nvidia-smi`, otherwise `lspci` |
+| units and formats | registry | the locale |
+| shortcut and autostart | WScript.Shell and the registry | `.desktop` files |
+| the sensor library | four `.dll` files | not needed at all |
+
+**What has been checked:** the parsing of what the kernel hands out, on
+fabricated `/sys` files — Ryzen, Intel, an AMD card, the empty case; the
+choice of units by locale; the contents of the `.desktop` file. Run
+`python проверки/linux.py` to see it.
+
+**What has not:** whether the window comes up, whether the tray icon is
+picked up, whether the screen is found on the port, and how the icons
+look without the Windows icon font. There is no Linux machine here, so
+these can only be checked on a real one.
+
+If you run it on Linux, please open an issue with what broke — that is
+exactly what is missing.
+
+---
+
 ## The sensor library
 
 For temperatures you need **exactly four files** from the

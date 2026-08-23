@@ -25,6 +25,7 @@ import os
 import threading
 
 import papka
+import sistema
 
 FILE = "settings.json"
 
@@ -162,6 +163,9 @@ RUN_NAME = "EOne screen"
 
 def autostart_state():
     """Прописана ли программа в автозапуск. None - выяснить не удалось."""
+    if sistema.LINUX:
+        put = sistema.yarlyk_put(avtozapusk=True)
+        return bool(put and os.path.exists(put))
     try:
         import winreg
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as k:
@@ -174,11 +178,18 @@ def autostart_state():
 
 
 def set_autostart(on, command=None):
+    """Запускать ли программу вместе с системой."""
     """Прописать или убрать запуск вместе с Windows.
 
     Запускаем через app.bat, чтобы он сам поднял права: без них
     не читается температура процессора.
     """
+    if sistema.LINUX:
+        # На Linux автозапуск - тот же .desktop, только в папке autostart.
+        ok = sistema.sdelat_yarlyk(on, command or _komanda_zapuska(),
+                                   avtozapusk=True)
+        set("start.autostart", bool(ok and on))
+        return bool(ok)
     try:
         import winreg
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0,
@@ -204,6 +215,16 @@ def set_autostart(on, command=None):
 # --- ярлык на рабочем столе --------------------------------------------------
 
 YARLYK = "EOne screen.lnk"
+
+
+def _komanda_zapuska():
+    """Чем запускать программу: собранный exe, батник или сам app.py."""
+    here = papka.programma()
+    for imya in ("EOne screen.exe", "app.bat", "app.py"):
+        put = os.path.join(here, imya)
+        if os.path.exists(put):
+            return put
+    return os.path.join(here, "app.py")
 
 
 def _rabochiy_stol():
@@ -243,6 +264,12 @@ def set_yarlyk(on, icon=None):
     Сам ярлык делает WScript.Shell через powershell - так не нужна
     ни одна лишняя библиотека.
     """
+    if sistema.LINUX:
+        # На Linux ярлык - это текстовый файл .desktop в своей папке.
+        znachok = icon or os.path.join(papka.programma(), "EOne screen.png")
+        ok = sistema.sdelat_yarlyk(on, _komanda_zapuska(), znachok)
+        set("start.desktop_shortcut", bool(ok and on))
+        return bool(ok)
     put = yarlyk_put()
     if not on:
         try:

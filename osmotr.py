@@ -30,6 +30,7 @@ import time
 
 import edinicy
 import papka
+import sistema
 
 IS_WINDOWS = sys.platform.startswith("win")
 BASE = papka.programma()
@@ -143,27 +144,13 @@ def biblioteki():
 # --- права и файлы библиотеки ------------------------------------------------
 
 def zablokirovan(put):
-    """Помечен ли файл как скачанный из интернета.
-
-    Windows держит пометку отдельным потоком NTFS. Пока она на месте,
-    .NET отказывается загружать сборку и жалуется невнятно.
-    """
-    if not IS_WINDOWS:
-        return False
-    try:
-        with open(put + ":Zone.Identifier", "r", encoding="utf-8") as f:
-            return "ZoneId=3" in f.read() or "ZoneId=4" in f.read()
-    except OSError:
-        return False
+    """Помечен ли файл как скачанный из интернета. Разбор в sistema."""
+    return sistema.pometka_iz_interneta(put)
 
 
 def razblokirovat(put):
     """Снять пометку. Файл при этом не меняется."""
-    try:
-        os.remove(put + ":Zone.Identifier")
-        return True
-    except OSError:
-        return False
+    return sistema.snyat_pometku(put)
 
 
 def prava():
@@ -177,7 +164,14 @@ def prava():
 
 
 def dll(snimat_pometki=True):
-    """Файлы библиотеки датчиков: на месте ли и не заблокированы ли."""
+    """Файлы библиотеки датчиков: на месте ли и не заблокированы ли.
+
+    На Linux их не бывает вовсе: температуры отдаёт ядро, и спрашивать
+    про чужую библиотеку там незачем.
+    """
+    if not sistema.nuzhna_biblioteka_datchikov():
+        return [Nahodka(None, "температуры читает ядро, "
+                              "библиотека датчиков не нужна")], True
     nahodki, net, zablokirovany = [], [], []
     for imya in DLL_NUZHNY:
         put = os.path.join(BASE, imya)

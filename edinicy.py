@@ -32,6 +32,7 @@ import sys
 import time
 
 import prefs
+import sistema
 
 IS_WINDOWS = sys.platform.startswith("win")
 
@@ -53,7 +54,10 @@ def _iz_windows():
     if _sistema is not None and time.time() - _sistema_kogda < 5.0:
         return _sistema
     itog = {"temp": "c", "wind": "kmh", "clock": "24", "date": "dmy"}
-    if IS_WINDOWS:
+    ot_sistemy = sistema.edinicy_sistemy()      # не Windows - спросим там
+    if ot_sistemy:
+        itog.update(ot_sistemy)
+    elif IS_WINDOWS:
         try:
             import winreg
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
