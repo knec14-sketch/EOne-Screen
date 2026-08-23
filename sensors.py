@@ -42,6 +42,7 @@ except ImportError:
 from yazyk import t
 
 import edinicy
+import papka
 
 
 IS_WINDOWS = sys.platform.startswith("win")
@@ -878,7 +879,7 @@ def save_source(url, kind=None, key=None, karta=None):
     ветер и всё остальное. Пустое описание убирается, чтобы вернуться
     к готовому переходнику было одной кнопкой.
     """
-    here = os.path.dirname(os.path.abspath(__file__))
+    here = papka.programma()
     path = os.path.join(here, WEATHER_CONF)
     try:
         with open(path, encoding="utf-8") as f:
@@ -928,7 +929,7 @@ def try_source(url, latitude, longitude, kind=None, key=None, karta=None):
 
 def _weather_config():
     """Координаты для прогноза. Если их нет - определяем по адресу в сети."""
-    here = os.path.dirname(os.path.abspath(__file__))
+    here = papka.programma()
     path = os.path.join(here, WEATHER_CONF)
     conf = {}
     if os.path.exists(path):
@@ -983,7 +984,7 @@ def find_places(name, limit=6, language="ru"):
 def save_location(latitude, longitude, city="", language=None,
                   update_minutes=None):
     """Записать координаты в weather.json рядом с программой."""
-    here = os.path.dirname(os.path.abspath(__file__))
+    here = papka.programma()
     path = os.path.join(here, WEATHER_CONF)
     conf = {}
     try:
@@ -1262,7 +1263,7 @@ class Sensors:
     # --- способ 1: библиотека напрямую ---------------------------------
 
     def _try_direct_lhm(self):
-        here = os.path.dirname(os.path.abspath(__file__))
+        here = papka.programma()
         places = [
             "LibreHardwareMonitorLib.dll",
             os.path.join("lhm", "LibreHardwareMonitorLib.dll"),
@@ -1552,7 +1553,7 @@ class Sensors:
             return
         lang = "ru"
         try:
-            here = os.path.dirname(os.path.abspath(__file__))
+            here = papka.programma()
             with open(os.path.join(here, WEATHER_CONF), encoding="utf-8") as f:
                 lang = str(json.load(f).get("language", "ru")).lower()
         except Exception:
@@ -1578,7 +1579,7 @@ class Sensors:
             # Настройки перечитываем каждый заход: сменил город в окне -
             # и ждать перезапуска программы не нужно.
             try:
-                here = os.path.dirname(os.path.abspath(__file__))
+                here = papka.programma()
                 with open(os.path.join(here, WEATHER_CONF), encoding="utf-8") as f:
                     conf = json.load(f)
             except Exception:

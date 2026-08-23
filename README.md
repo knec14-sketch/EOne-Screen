@@ -291,4 +291,9 @@ with the author named.
 The LibreHardwareMonitor library belongs to its authors and is
 distributed under its own licence, MPL 2.0.
 
+The "Skywatch" theme carries its own typeface — **Project Space** by Ver
+Wave, under the SIL Open Font License 1.1. It lives in
+`themes/Skywatch/fonts/` together with the licence text, so the theme
+looks the same on any machine without installing anything.
+
 Author — **EOne**.

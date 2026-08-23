@@ -217,6 +217,52 @@ class App:
         self.current = None
         self.show_page("home")
 
+    def smenit_yazyk(self, code):
+        """Сменить язык окна прямо сейчас, без перезапуска.
+
+        Пересобираем окно, а не переводим надписи на месте: почти весь
+        текст задаётся при создании виджета, а обратного перевода
+        (с английского на русский) у нас нет и заводить его незачем.
+
+        Процесс при этом остаётся тот же - и это важнее, чем кажется:
+        собранная программа просит права администратора при запуске,
+        и перезапуск заставил бы Windows спросить их заново. Вывод
+        на экран водянки тоже не прерывается: он живёт в своём потоке
+        и про окно ничего не знает.
+        """
+        if code == prefs.get("ui.lang", yazyk.RU):
+            return
+        prefs.set("ui.lang", code)
+        yazyk.vybrat(code)
+
+        # Несохранённые правки темы пережили бы пересборку только
+        # на диске - спрашиваем, как с ними быть.
+        if getattr(self, "editor", None) is not None and self.editor.dirty:
+            otvet = messagebox.askyesnocancel(
+                t("Смена языка"),
+                t("В теме есть несохранённые правки. Сохранить их?"))
+            if otvet is None:
+                return
+            if otvet:
+                self.editor.save()
+
+        bylo = self.current if self.current != "editor" else "themes"
+        self._remember_window()
+        for w in list(self.root.winfo_children()):
+            w.destroy()
+        self.tip = look_mod.Tip(self.root, self.look)
+        self._build()
+        self.show_page(bylo)
+        # Меню значка рисует pystray, а не Tk: наш крючок перевода
+        # до него не достаёт, поэтому значок заводим заново.
+        if self.icon is not None:
+            try:
+                self.icon.stop()
+            except Exception:
+                pass
+            self.icon = None
+            self._start_tray()
+
     def show_page(self, key):
         if key == self.current:
             return

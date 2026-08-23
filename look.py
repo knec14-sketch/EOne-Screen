@@ -162,6 +162,25 @@ ICONS = {
 }
 
 
+# Запасные значки — обычные знаки Unicode, какие есть в шрифтах любой
+# системы. Нужны там, где нет набора Windows: на Linux, на урезанной
+# сборке, на машине без Segoe Fluent Icons. Красивее было бы рисовать
+# их самим, но эти хотя бы читаются, а квадраты не читаются никак.
+ICONS_ZAPAS = {
+    "power": "⏻", "home": "⌂", "themes": "❖", "edit": "✎",
+    "settings": "⚙", "sensors": "📈", "about": "ⓘ",
+    "sun": "☀", "moon": "☾", "sunrise": "🌅", "windows": "◐",
+    "clock": "🕐", "brightness": "☀", "layers": "≡", "grid": "▦",
+    "chip": "▣", "thermo": "🌡", "water": "💧", "sliders": "⚌",
+    "help": "?", "pause": "❚❚", "play": "▶", "refresh": "↻",
+    "add": "＋", "delete": "🗑", "copy": "⧉", "save": "💾",
+    "folder": "🗀", "open": "🗁", "export": "↗", "import": "↓",
+    "up": "⌃", "down": "⌄", "hide": "◌", "show": "◉",
+    "warning": "⚠", "ok": "✓", "tray": "▭", "screen": "🖵",
+    "undo": "↺",
+}
+
+
 class Look:
     """Текущее оформление окна. Один объект на всю программу."""
 
@@ -255,9 +274,22 @@ class Look:
             setattr(self, attr, got)
         return got
 
-    @staticmethod
-    def icon(name):
-        return ICONS.get(name, "")
+    def est_shrift_znachkov(self):
+        """Есть ли в системе набор значков Windows.
+
+        Проверяем один раз: список семейств у Tk спрашивать недёшево.
+        """
+        got = getattr(self, "_znachki_est", None)
+        if got is None:
+            got = self._face("icons") in FACES["icons"][:-1]
+            self._znachki_est = got
+        return got
+
+    def icon(self, name):
+        """Знак значка. Нет набора Windows - берём обычный Unicode."""
+        if self.est_shrift_znachkov():
+            return ICONS.get(name, "")
+        return ICONS_ZAPAS.get(name, "•")
 
     # --- ttk -------------------------------------------------------------
 

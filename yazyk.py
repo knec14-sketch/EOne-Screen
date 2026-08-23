@@ -363,6 +363,9 @@ SLOVAR = {
     "Светлое": "Light",
     "Тёмное": "Dark",
     "Язык": "Language",
+    "Смена языка": "Changing the language",
+    "В теме есть несохранённые правки. Сохранить их?":
+        "The theme has unsaved changes. Save them?",
     "Изменения применятся при следующем запуске.":
         "Changes take effect the next time the program starts.",
     "Ярлык на рабочем столе": "A shortcut on the desktop",

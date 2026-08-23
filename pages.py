@@ -27,6 +27,7 @@ from PIL import ImageTk
 import edinicy
 import look as L
 import panel as panel_mod
+import papka
 import prefs
 import sensors as sensors_mod
 import themes as themes_mod
@@ -730,10 +731,8 @@ class SettingsPage(ttk.Frame):
         self.lang_lbl.pack(anchor="w", pady=(8, 0))
 
     def _set_lang(self, value):
-        prefs.set("ui.lang", value)
-        yazyk.vybrat(value)
-        self.lang_lbl.configure(
-            text="Изменения применятся при следующем запуске.")
+        """Язык меняется сразу: окно пересобирается на новом языке."""
+        self.app.smenit_yazyk(value)
 
     def _set_ui_theme(self, value):
         prefs.set("ui.theme", value)
@@ -1684,7 +1683,7 @@ class SettingsPage(ttk.Frame):
         # Файл на языке окна: читать условия на чужом языке человек
         # не обязан. Нет английского рядом - открываем русский.
         yaz = "en" if yazyk._teper == yazyk.EN else "ru"
-        ryadom = os.path.dirname(os.path.abspath(__file__))
+        ryadom = papka.programma()
         path = os.path.join(ryadom, LICENSE_FILE.get(yaz, "LICENSE"))
         if not os.path.exists(path):
             path = os.path.join(ryadom, "LICENSE")

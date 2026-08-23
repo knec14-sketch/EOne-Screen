@@ -24,6 +24,8 @@ import json
 import os
 import threading
 
+import papka
+
 FILE = "settings.json"
 
 DEFAULTS = {
@@ -77,7 +79,7 @@ _path = None
 def path():
     global _path
     if _path is None:
-        here = os.path.dirname(os.path.abspath(__file__))
+        here = papka.programma()
         _path = os.path.join(here, FILE)
     return _path
 
@@ -183,7 +185,7 @@ def set_autostart(on, command=None):
                             winreg.KEY_SET_VALUE) as k:
             if on:
                 if command is None:
-                    here = os.path.dirname(os.path.abspath(__file__))
+                    here = papka.programma()
                     bat = os.path.join(here, "app.bat")
                     command = '"{}"'.format(bat if os.path.exists(bat)
                                             else os.path.join(here, "app.py"))
@@ -234,8 +236,9 @@ def yarlyk_est():
 def set_yarlyk(on, icon=None):
     """Создать или убрать ярлык на рабочем столе.
 
-    Ярлык ведёт на app.bat, а не на app.py: батник поднимает права,
-    без которых не читается температура процессора.
+    Ярлык ведёт на собранную программу, если она лежит рядом, иначе
+    на app.bat: и то и другое поднимает права, без которых не читается
+    температура процессора.
 
     Сам ярлык делает WScript.Shell через powershell - так не нужна
     ни одна лишняя библиотека.
@@ -249,10 +252,14 @@ def set_yarlyk(on, icon=None):
             return True
         except Exception:
             return False
-    here = os.path.dirname(os.path.abspath(__file__))
-    cel = os.path.join(here, "app.bat")
-    if not os.path.exists(cel):
-        cel = os.path.join(here, "app.py")
+    # Куда вести. Собранная программа идёт первой: она запускается
+    # двойным щелчком и сама просит права. Батник - для тех, кто
+    # работает из исходников.
+    here = papka.programma()
+    for imya in ("EOne screen.exe", "app.bat", "app.py"):
+        cel = os.path.join(here, imya)
+        if os.path.exists(cel):
+            break
     stroki = [
         "$s = (New-Object -ComObject WScript.Shell).CreateShortcut({!r})"
         .format(put).replace("'", '"'),
