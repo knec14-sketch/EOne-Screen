@@ -184,9 +184,8 @@ temperatures, the weather, the themes, the tray icon and the physical
 screen itself, at about 28 frames a second against a target of 30. The
 [full report is in issue #1][issue1].
 
-Read that as it is meant: **the author has no Linux machine.**
-Everything below comes from someone else's terminal output. Where a
-thing has not been confirmed by anybody, it says so.
+There is no Linux machine here, so anything not yet run on one is
+marked as such below.
 
 ```
 pip install pillow psutil pyserial numpy pystray
@@ -242,15 +241,16 @@ confirmed on real hardware — the protocol turned out to be the same.
 Other ids are deliberately left out until somebody confirms them the
 same way.
 
-**Still unconfirmed by anybody:** the graphics-card load, memory and
-power readings from `/sys/class/drm` (the parsing is checked against
-fabricated files, never against a real card); autostart after a reboot;
-and the shortcut in the applications menu. If you can check any of
-those, please say so in [issue #1][issue1].
+**Not yet run on real hardware:** the graphics-card load, memory and
+power readings from `/sys/class/drm` — the parsing is checked against
+fabricated files, not against a real card; autostart after a reboot;
+and the shortcut in the applications menu. If any of those works or
+does not on your machine, [open an issue][issues].
 
 Run `python проверки/linux.py` to see the parsing checks.
 
 [issue1]: https://github.com/knec14-sketch/EOne-Screen/issues/1
+[issues]: https://github.com/knec14-sketch/EOne-Screen/issues
 
 ---
 
