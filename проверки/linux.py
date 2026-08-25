@@ -88,6 +88,146 @@ shutil.rmtree(koren, ignore_errors=True)
 sverit("нет папки hwmon — пусто, а не падение",
        sistema.temperatury("/такого/пути/нет"), {})
 
+
+print("\n=== видеокарта из /sys/class/drm ===")
+
+
+def drm(*karty):
+    """Подделать /sys/class/drm так, как его выкладывает драйвер.
+
+    Каждая карта — (номер, {файл: содержимое}, {файл в hwmon: содержимое}).
+    """
+    koren = tempfile.mkdtemp(prefix="drm-")
+    for nomer, svoi, hwmon_svoi in karty:
+        put = os.path.join(koren, "card{}".format(nomer), "device")
+        os.makedirs(put)
+        for imya, chto in svoi.items():
+            with open(os.path.join(put, imya), "w") as f:
+                f.write(str(chto) + "\n")
+        if hwmon_svoi is not None:
+            h = os.path.join(put, "hwmon", "hwmon3")
+            os.makedirs(h)
+            for imya, chto in hwmon_svoi.items():
+                with open(os.path.join(h, imya), "w") as f:
+                    f.write(str(chto) + "\n")
+    return koren
+
+
+# Radeon RX 7900 XT: 20 ГБ видеопамяти, из них занято 4 ГБ
+koren = drm((1, {"gpu_busy_percent": 37,
+                 "mem_info_vram_used": 4 * 1073741824,
+                 "mem_info_vram_total": 20 * 1073741824},
+             {"power1_average": 132000000,      # микроватты
+              "freq1_input": 2100000000,        # герцы
+              "fan1_input": 1450}))
+got = sistema.videokarta_pokazaniya(koren)
+sverit("загрузка берётся как есть", got.get("загрузка"), 37.0)
+sverit("видеопамять переводится в мегабайты",
+       got.get("память_занято_мб"), 4096.0)
+sverit("вся видеопамять переводится в мегабайты",
+       got.get("память_всего_мб"), 20480.0)
+sverit("доля занятой видеопамяти считается", got.get("память_доля"), 20.0)
+sverit("микроватты переводятся в ватты", got.get("мощность_вт"), 132.0)
+sverit("герцы переводятся в мегагерцы", got.get("частота_мгц"), 2100.0)
+sverit("обороты вентилятора берутся как есть", got.get("вентилятор"), 1450.0)
+sverit("температуры здесь нет — она приходит из hwmon",
+       [k for k in got if "температ" in k], [])
+shutil.rmtree(koren, ignore_errors=True)
+
+# У части плат RDNA есть только мгновенное значение
+koren = drm((0, {"gpu_busy_percent": 5}, {"power1_input": 24000000}))
+sverit("нет power1_average — берётся power1_input",
+       sistema.videokarta_pokazaniya(koren).get("мощность_вт"), 24.0)
+shutil.rmtree(koren, ignore_errors=True)
+
+# Встроенная карта молчит, настоящая отвечает: берём ту, что содержательнее
+koren = drm((0, {}, None),
+            (1, {"gpu_busy_percent": 61,
+                 "mem_info_vram_used": 1073741824,
+                 "mem_info_vram_total": 8 * 1073741824}, None))
+sverit("из двух карт берётся та, что ответила",
+       sistema.videokarta_pokazaniya(koren).get("загрузка"), 61.0)
+shutil.rmtree(koren, ignore_errors=True)
+
+# Драйвер отдаёт чепуху — лучше промолчать, чем показать 300 %
+koren = drm((0, {"gpu_busy_percent": 300}, None))
+sverit("невозможная загрузка отбрасывается",
+       sistema.videokarta_pokazaniya(koren), {})
+shutil.rmtree(koren, ignore_errors=True)
+
+# Пустая папка устройства: у Intel и старых Radeon этих файлов нет вовсе
+koren = drm((0, {}, None))
+sverit("нечего читать — пусто, а не падение",
+       sistema.videokarta_pokazaniya(koren), {})
+shutil.rmtree(koren, ignore_errors=True)
+
+sverit("нет папки drm — пусто, а не падение",
+       sistema.videokarta_pokazaniya("/такого/пути/нет"), {})
+
+
+print("\n=== заголовок значка возле часов ===")
+# Xorg пишет заголовок в latin-1: на этом падал весь запуск
+sverit("русский заголовок переживает latin-1",
+       sistema.bezopasnyy_zagolovok("EOne screen — экран выключен", "xorg")
+       .encode("latin-1", "strict").decode("latin-1"),
+       "EOne screen - ekran vyklyuchen")
+sverit("длинное тире заменяется",
+       "—" in sistema.bezopasnyy_zagolovok("EOne screen — работа", "xorg"),
+       False)
+sverit("латиница не трогается",
+       sistema.bezopasnyy_zagolovok("EOne screen off", "xorg"),
+       "EOne screen off")
+sverit("AppIndicator получает заголовок как есть",
+       sistema.bezopasnyy_zagolovok("EOne screen — экран выключен",
+                                    "appindicator"),
+       "EOne screen — экран выключен")
+sverit("не знаем подложки — переводим на всякий случай",
+       "экран" in sistema.bezopasnyy_zagolovok("EOne screen — экран", None),
+       False)
+
+bylo_podlozhki = os.environ.get("PYSTRAY_BACKEND")
+os.environ["PYSTRAY_BACKEND"] = "appindicator"
+sverit("выбор человека не перебивается", sistema.podgotovit_trey(),
+       "appindicator")
+if bylo_podlozhki is None:
+    os.environ.pop("PYSTRAY_BACKEND", None)
+else:
+    os.environ["PYSTRAY_BACKEND"] = bylo_podlozhki
+
+
+class PystrayДляВида:
+    class Icon:
+        pass
+
+
+PystrayДляВида.Icon.__module__ = "pystray._xorg"
+sverit("подложку спрашиваем у самого pystray",
+       sistema.podlozhka_treya(PystrayДляВида), "xorg")
+PystrayДляВида.Icon.__module__ = "pystray._appindicator"
+sverit("и узнаём AppIndicator",
+       sistema.podlozhka_treya(PystrayДляВида), "appindicator")
+
+
+print("\n=== код устройства ===")
+
+
+class ПортДляВида:
+    def __init__(self, vid, pid):
+        self.vid, self.pid = vid, pid
+
+
+import txw818                                              # noqa: E402
+
+sverit("наша помпа Flow 360 узнаётся",
+       txw818.nash_li(ПортДляВида(0x33C3, 0x7788)), True)
+sverit("родственная Flow 240 тоже узнаётся",
+       txw818.nash_li(ПортДляВида(0x33C3, 0x7792)), True)
+sverit("чужое устройство не берётся",
+       txw818.nash_li(ПортДляВида(0x33C3, 0x1234)), False)
+sverit("чужой производитель не берётся",
+       txw818.nash_li(ПортДляВида(0x1A86, 0x7788)), False)
+
+
 print("\n=== единицы по локали ===")
 bylo_lang = os.environ.get("LANG")
 for lokal, klyuch, nado in (("ru_RU.UTF-8", "temp", "c"),
@@ -130,6 +270,51 @@ sverit("библиотека датчиков не нужна",
        sistema.nuzhna_biblioteka_datchikov(), False)
 sverit("пометки «из интернета» не бывает",
        sistema.pometka_iz_interneta(__file__), False)
+
+
+print("\n=== показания карты ложатся в ключи панели ===")
+# Разбор проверен выше. Здесь другое: те ли имена получит панель.
+# Ошибиться тут легко и незаметно - панель просто покажет прочерк.
+import sensors as sensors_mod                               # noqa: E402
+
+bylo_chtenie = sistema.videokarta_pokazaniya
+sistema.videokarta_pokazaniya = lambda *a, **k: {
+    "загрузка": 37.0, "память_занято_мб": 4096.0,
+    "память_всего_мб": 20480.0, "память_доля": 20.0,
+    "мощность_вт": 132.0, "частота_мгц": 2100.0, "вентилятор": 1450.0}
+s = sensors_mod.Sensors.__new__(sensors_mod.Sensors)
+s.gpu_source = None
+legli = s._karta_linux()
+sverit("загрузка", legli.get("gpu_load"), 37.0)
+sverit("видеопамять занято, ГБ", legli.get("gpu_mem_used_gb"), 4.0)
+sverit("видеопамять всего, ГБ", legli.get("gpu_mem_total_gb"), 20.0)
+sverit("доля видеопамяти", legli.get("gpu_mem_load"), 20.0)
+sverit("мощность", legli.get("gpu_power_w"), 132.0)
+sverit("частота", legli.get("gpu_mhz"), 2100.0)
+sverit("вентилятор", legli.get("gpu_fan"), 1450.0)
+sverit("источник показаний назван", s.gpu_source, "ядро Linux (drm)")
+sverit("все ключи известны панели",
+       sorted(k for k in legli if k not in sensors_mod.Sensors.GPU_KEYS),
+       ["gpu_mem_total_gb", "gpu_mem_used_gb"])   # эти две считает панель
+
+sistema.videokarta_pokazaniya = lambda *a, **k: {}
+s.gpu_source = None
+sverit("нечего читать — ничего и не кладём", s._karta_linux(), {})
+sistema.videokarta_pokazaniya = bylo_chtenie
+
+
+print("\n=== осмотр машины не просит лишнего ===")
+import osmotr                                              # noqa: E402
+
+osmotr.IS_WINDOWS = False
+sverit("прав администратора не требует",
+       [n.horosho for n in osmotr.prava()[0]], [None])
+sverit("библиотеку датчиков не требует",
+       [n.horosho for n in osmotr.dll()[0]], [None])
+sverit("pythonnet в список не попадает",
+       any(n.chto == "pythonnet" for n in osmotr.biblioteki()[0]), False)
+sverit("про app.bat не поминает",
+       any("bat" in (n.chinit or "") for n in osmotr.prava()[0]), False)
 
 print("\nитог: {}".format("всё сошлось" if not bedy
                           else "замечаний: {}".format(len(bedy))))

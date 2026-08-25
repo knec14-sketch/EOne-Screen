@@ -1195,6 +1195,10 @@ class Sensors:
         способу: запускать nvidia-smi по одному разу.
         """
         if not self.has_nvidia:
+            # Нет Nvidia - на Linux остальное можно взять у самого ядра.
+            # На Windows этим занимается библиотека датчиков.
+            if sistema.LINUX:
+                return self._loop_karta_linux()
             return
         args = ["nvidia-smi", "--query-gpu=" + self.GPU_QUERY,
                 "--format=csv,noheader,nounits"]
@@ -1508,6 +1512,9 @@ class Sensors:
 
         Ни библиотеки датчиков, ни прав администратора не нужно -
         читаем /sys/class/hwmon, разбор лежит в sistema.temperatury.
+
+        Остальное по видеокарте лежит в другом месте ядра и снимается
+        в потоке видеокарты - смотри _loop_karta_linux.
         """
         self.temp_source = "ядро Linux"
         while not self._stop.wait(self.plan["temps"][1]):
@@ -1524,6 +1531,61 @@ class Sensors:
             elif not self.temp_note:
                 self.temp_note = ("ядро не отдаёт температур: "
                                   "нет /sys/class/hwmon")
+
+    def _loop_karta_linux(self):
+        """Видеокарта AMD и Intel на Linux: всё, кроме температуры.
+
+        Драйвер amdgpu выкладывает загрузку и видеопамять прямо в папке
+        устройства, а мощность и обороты - в hwmon внутри неё. Ни прав,
+        ни сторонних программ не нужно: это те же обычные файлы, что
+        и температуры. Разбор лежит в sistema, здесь только раскладка
+        по нашим ключам.
+
+        Температура сюда не попадает: она приходит из hwmon вместе
+        с процессором и снимается в потоке температур.
+        """
+        pusto = 0
+        while not self._stop.is_set():
+            vals = self._karta_linux()
+            if vals:
+                self._set(**vals)
+            elif not self.gpu_source:
+                pusto += 1
+                # Три пустых круга подряд - значит и не будет: у Intel
+                # и старых Radeon этих файлов нет вовсе. Молчим дальше,
+                # чтобы не крутить чтение впустую.
+                if pusto >= 3:
+                    if not self.gpu_note:
+                        self.gpu_note = ("ядро не отдаёт показаний "
+                                         "видеокарты: нет /sys/class/drm")
+                    return
+            self._stop.wait(self.plan["gpu"][1])
+
+    def _karta_linux(self):
+        """Загрузка, видеопамять и мощность видеокарты из /sys/class/drm."""
+        got = sistema.videokarta_pokazaniya() or {}
+        if not got:
+            return {}
+        vals = {}
+        if "загрузка" in got:
+            vals["gpu_load"] = round(got["загрузка"], 1)
+        if "память_занято_мб" in got:
+            vals["gpu_mem_used_mb"] = round(got["память_занято_мб"], 1)
+            vals["gpu_mem_used_gb"] = got["память_занято_мб"] / 1024.0
+        if "память_всего_мб" in got:
+            vals["gpu_mem_total_mb"] = round(got["память_всего_мб"], 1)
+            vals["gpu_mem_total_gb"] = got["память_всего_мб"] / 1024.0
+        if "память_доля" in got:
+            vals["gpu_mem_load"] = round(got["память_доля"], 1)
+        if "мощность_вт" in got:
+            vals["gpu_power_w"] = round(got["мощность_вт"], 1)
+        if "частота_мгц" in got:
+            vals["gpu_mhz"] = round(got["частота_мгц"], 1)
+        if "вентилятор" in got:
+            vals["gpu_fan"] = round(got["вентилятор"], 1)
+        if vals and not self.gpu_source:
+            self.gpu_source = "ядро Linux (drm)"
+        return vals
 
     def _loop_temps_wmi(self):
         namespaces = ["root/LibreHardwareMonitor", "root/OpenHardwareMonitor"]

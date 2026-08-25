@@ -30,10 +30,13 @@ Windows-часть уже написана и проверена, поэтому
 с экраном по последовательному порту. Их трогать незачем - они одинаковы
 на обеих системах.
 
-ПРОВЕРЕНО НА WINDOWS. Linux-ветки написаны по описаниям ядра и проверены
-на поддельных файлах /sys, но на живой машине с Linux не запускались ни
-разу. Это надо знать тому, кто возьмётся: первое, что стоит сделать, -
-запустить и прислать, что сломалось.
+ПРОВЕРЕНО НА WINDOWS. Linux-часть проверена на поддельных файлах /sys,
+а 23.08.2026 её впервые прогнали на живой машине: CachyOS, KDE Plasma 6,
+Wayland, Intel i5-13600KF и Radeon RX 7900 XT. Отчёт - в issue #1.
+Там подтвердились температуры, имена железа, единицы по локали, окно
+и сам экран; там же вылезли значок в трее и второй код устройства.
+Что на живой машине ещё НЕ проверено: автозапуск после перезагрузки
+и ярлык из меню приложений.
 """
 
 import os
@@ -65,6 +68,17 @@ def _prochest(put):
             return f.read().strip()
     except OSError:
         return ""
+
+
+def _chislo(put):
+    """Число из файла /sys. Нет файла или не число - None."""
+    syroe = _prochest(put)
+    if not syroe:
+        return None
+    try:
+        return float(syroe.split()[0])
+    except (ValueError, IndexError):
+        return None
 
 
 # --- температуры -------------------------------------------------------------
@@ -133,6 +147,80 @@ def temperatury(koren="/sys/class/hwmon"):
                              ("tctl", "tdie", "package", "edge"))), None)
         gotovo[kto] = obshy if obshy is not None else max(z for _p, z in spisok)
     return gotovo
+
+
+# --- что ещё отдаёт видеокарта -----------------------------------------------
+
+# Драйвер amdgpu выкладывает загрузку и видеопамять прямо в папке
+# устройства, а мощность и обороты - в hwmon внутри неё. Nvidia про это
+# молчит: у неё есть nvidia-smi, и он отвечает подробнее.
+def videokarta_pokazaniya(koren="/sys/class/drm"):
+    """Загрузка, видеопамять, мощность и обороты видеокарты. Не Linux - None.
+
+    Температуру сюда не кладём: она приходит из hwmon вместе с процессором,
+    и читает её temperatury().
+
+    koren задаётся, чтобы разбор можно было проверить на подложенных
+    файлах, не имея Linux под рукой.
+    """
+    if not LINUX:
+        return None
+    itog = {}
+    try:
+        karty = sorted(d for d in os.listdir(koren)
+                       if d.startswith("card") and d[4:].isdigit())
+    except OSError:
+        return itog
+    for karta in karty:
+        put = os.path.join(koren, karta, "device")
+
+        zanyato = _chislo(os.path.join(put, "mem_info_vram_used"))
+        vsego = _chislo(os.path.join(put, "mem_info_vram_total"))
+        zagruzka = _chislo(os.path.join(put, "gpu_busy_percent"))
+
+        vatty = chastota = oboroty = None
+        hwmon = os.path.join(put, "hwmon")
+        try:
+            papki = sorted(os.listdir(hwmon))
+        except OSError:
+            papki = []
+        for papka in papki:
+            h = os.path.join(hwmon, papka)
+            # power1_average есть не у всех: у части плат RDNA есть только
+            # мгновенное power1_input. Берём то, что нашлось.
+            mkvt = (_chislo(os.path.join(h, "power1_average"))
+                    or _chislo(os.path.join(h, "power1_input")))
+            if mkvt:
+                vatty = mkvt / 1000000.0          # ядро отдаёт микроватты
+            gc = _chislo(os.path.join(h, "freq1_input"))
+            if gc:
+                chastota = gc / 1000000.0         # и герцы
+            ob = _chislo(os.path.join(h, "fan1_input"))
+            if ob is not None:
+                oboroty = ob
+
+        nashli = {}
+        if zagruzka is not None and 0 <= zagruzka <= 100:
+            nashli["загрузка"] = zagruzka
+        if zanyato is not None:
+            nashli["память_занято_мб"] = zanyato / 1048576.0
+        if vsego:
+            nashli["память_всего_мб"] = vsego / 1048576.0
+            if zanyato is not None:
+                nashli["память_доля"] = 100.0 * zanyato / vsego
+        if vatty is not None:
+            nashli["мощность_вт"] = vatty
+        if chastota is not None:
+            nashli["частота_мгц"] = chastota
+        if oboroty is not None:
+            nashli["вентилятор"] = oboroty
+
+        # На машине бывает две карты: встроенная и настоящая. Встроенная
+        # обычно молчит про загрузку, поэтому берём ту, что ответила
+        # содержательнее.
+        if len(nashli) > len(itog):
+            itog = nashli
+    return itog
 
 
 # --- как называется железо ---------------------------------------------------
@@ -209,6 +297,133 @@ def temnoe_oformlenie():
     if got:
         return "dark" in got
     return None
+
+
+# --- значок возле часов ------------------------------------------------------
+
+# На чём pystray рисует значок, решается один раз при его загрузке.
+# Сам он пробует по порядку: appindicator, gtk, xorg - и до Xorg
+# доходит, когда первых двух нет. А Xorg пишет заголовок окна в latin-1,
+# и на первой же русской букве падает с UnicodeEncodeError.
+#
+# Мы вмешиваемся только в один случай: AppIndicator есть, но за ним
+# в очереди стоит ещё и GTK со своим StatusIcon, который на Wayland
+# давно не показывается. Тогда называем подложку прямо.
+PODLOZHKI_TREYA = ("AppIndicator3", "AyatanaAppIndicator3")
+
+
+def _est_appindicator():
+    """Поднимется ли ветка AppIndicator у pystray.
+
+    Спрашиваем ровно то же, что спрашивает он сам: gi, Gtk 3.0 и один
+    из двух индикаторов. Проверять меньше нельзя - назовём подложку,
+    которая не заведётся, и останемся вовсе без значка.
+    """
+    try:
+        import gi
+        gi.require_version("Gtk", "3.0")
+        __import__("gi.repository", fromlist=["Gtk"])
+    except Exception:
+        return False
+    for imya in PODLOZHKI_TREYA:
+        try:
+            gi.require_version(imya, "0.1")
+            __import__("gi.repository", fromlist=[imya])
+            return True
+        except Exception:
+            continue
+    return False
+
+
+# Назвали ли подложку мы сами. Чужой выбор отменять нельзя: человек
+# ставил его руками и, скорее всего, знает почему.
+_NAZVALI_SAMI = False
+
+
+def podgotovit_trey():
+    """Выбрать, на чём рисовать значок. Возвращает выбранное или None.
+
+    Звать ДО «import pystray»: после загрузки он уже не переспросит.
+    Свой выбор человека не трогаем - он знает, что делает.
+    """
+    global _NAZVALI_SAMI
+    _NAZVALI_SAMI = False
+    if not LINUX:
+        return None
+    vybor = os.environ.get("PYSTRAY_BACKEND")
+    if vybor:
+        return vybor
+    if _est_appindicator():
+        os.environ["PYSTRAY_BACKEND"] = "appindicator"
+        _NAZVALI_SAMI = True
+        return "appindicator"
+    return None
+
+
+def otstupit_s_treya(nazvali=None):
+    """Убрать нашу подложку, чтобы pystray выбирал сам.
+
+    True - убрали, стоит попробовать ещё раз. False - отступать некуда:
+    подложку назвали не мы, а человек, либо её и не называли вовсе.
+    """
+    global _NAZVALI_SAMI
+    if not _NAZVALI_SAMI:
+        return False
+    os.environ.pop("PYSTRAY_BACKEND", None)
+    _NAZVALI_SAMI = False
+    return True
+
+
+def podlozhka_treya(pystray):
+    """На чём pystray рисует значок НА САМОМ ДЕЛЕ.
+
+    Не по нашей переменной, а по тому, что у него вышло: он решает при
+    загрузке и молча отступает на следующую ветку, если первая не встала.
+    От ответа зависит, выдержит ли заголовок русские буквы.
+    """
+    imya = getattr(getattr(pystray, "Icon", None), "__module__", "") or ""
+    return imya.rsplit(".", 1)[-1].lstrip("_")
+
+
+# Xorg пишет заголовок в latin-1, поэтому для него кириллицу переводим
+# в латинские буквы. Читать хуже, чем по-русски, но лучше, чем никак:
+# без этого программа просто не запускалась.
+_LATINICEY = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "yo",
+    "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "h", "ц": "c", "ч": "ch", "ш": "sh", "щ": "sch",
+    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+    "—": "-", "–": "-", "«": '"', "»": '"', "…": "...",
+}
+
+
+def bezopasnyy_zagolovok(stroka, podlozhka=None):
+    """Заголовок, который переживёт подложку значка.
+
+    podlozhka - что вернул podlozhka_treya(). Не сказали - считаем
+    худшее и переводим в латиницу: лишний раз перевести не страшно,
+    а не перевести - значит не запуститься.
+    """
+    if not LINUX or not stroka:
+        return stroka
+    if podlozhka in ("appindicator", "gtk"):
+        return stroka
+    try:
+        stroka.encode("latin-1")
+        return stroka                      # и так пройдёт
+    except UnicodeEncodeError:
+        pass
+    kuski = []
+    for bukva in stroka:
+        zamena = _LATINICEY.get(bukva.lower())
+        if zamena is None:
+            kuski.append(bukva)
+            continue
+        kuski.append(zamena.upper() if bukva.isupper() else zamena)
+    gotovo = "".join(kuski)
+    # Что не легло в таблицу - выкидываем: заголовок важнее буквы.
+    return gotovo.encode("latin-1", "replace").decode("latin-1")
 
 
 # --- ярлык и автозапуск ------------------------------------------------------
@@ -318,6 +533,8 @@ if __name__ == "__main__":
     print("температуры:        {}".format(temperatury()))
     print("процессор:          {}".format(imya_processora()))
     print("видеокарта:         {}".format(imya_videokarty()))
+    print("показания карты:    {}".format(videokarta_pokazaniya()))
+    print("подложка значка:    {}".format(podgotovit_trey()))
     print("единицы системы:    {}".format(edinicy_sistemy()))
     print("тёмное оформление:  {}".format(temnoe_oformlenie()))
     print("нужна библиотека:   {}".format(nuzhna_biblioteka_datchikov()))

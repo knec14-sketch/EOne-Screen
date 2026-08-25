@@ -44,7 +44,7 @@ done is at the end of this file.
 
 You need **Windows** and **Python 3.9 or newer**
 ([python.org](https://www.python.org/downloads/) — tick «Add python.exe
-to PATH» while installing).
+to PATH» while installing). Linux is [further down](#linux).
 
 ```
 pip install pillow psutil pyserial pythonnet numpy pystray
@@ -178,37 +178,79 @@ nothing needs restarting.
 
 ## Linux
 
-Work in progress, and it needs a tester.
+It works. A volunteer ran it on **CachyOS with KDE Plasma 6 and
+Wayland**, an Intel i5-13600KF and a Radeon RX 7900 XT: the window, the
+temperatures, the weather, the themes, the tray icon and the physical
+screen itself, at about 28 frames a second against a target of 30. The
+[full report is in issue #1][issue1].
 
-Everything that does not depend on the system is already portable: the
-drawing engine, the screen protocol (the device is found by its USB
-vendor/product id, so it should turn up as `/dev/ttyACM*`), the weather,
-the themes, the editor, and the readings that come from `psutil`.
+Read that as it is meant: **the author has no Linux machine.**
+Everything below comes from someone else's terminal output. Where a
+thing has not been confirmed by anybody, it says so.
 
-Everything that does depend on the system lives in one file,
-`sistema.py`:
+```
+pip install pillow psutil pyserial numpy pystray
+python app.py
+```
+
+`pythonnet` is not needed on Linux at all, and neither is `start.bat` —
+it clears a mark that only exists on Windows.
+
+**Getting at the screen.** Reading the serial port is granted by a
+group: `dialout` on Debian and Ubuntu, `uucp` on Arch and its relatives
+(CachyOS, Manjaro).
+
+```
+sudo usermod -a -G uucp $USER      # on Debian and Ubuntu: dialout
+```
+
+Then log out and back in.
+
+**The tray icon.** It needs AppIndicator, which is installed by the
+system rather than by `pip`:
+
+```
+sudo pacman -S --needed libappindicator python-gobject python-cairo
+```
+
+If you work inside a virtual environment, create it with
+`--system-site-packages`, or the `gi` module stays invisible and there
+is no icon:
+
+```
+python -m venv --system-site-packages .venv
+```
+
+The program runs without the icon too — the cross then closes it
+instead of hiding it.
+
+Everything that depends on the system lives in one file, `sistema.py`:
 
 | | Windows | Linux |
 |---|---|---|
 | temperatures | LibreHardwareMonitor, needs admin rights | `/sys/class/hwmon`, no rights needed |
+| graphics card load, memory, power | the sensor library | `/sys/class/drm` |
 | processor name | registry | `/proc/cpuinfo` |
 | graphics card name | WMI | `nvidia-smi`, otherwise `lspci` |
 | units and formats | registry | the locale |
 | shortcut and autostart | WScript.Shell and the registry | `.desktop` files |
 | the sensor library | four `.dll` files | not needed at all |
 
-**What has been checked:** the parsing of what the kernel hands out, on
-fabricated `/sys` files — Ryzen, Intel, an AMD card, the empty case; the
-choice of units by locale; the contents of the `.desktop` file. Run
-`python проверки/linux.py` to see it.
+**Devices.** Two are recognised: `33C3:7788` (Flow 360) and `33C3:7792`
+(Flow 240, the HONGTAI panel). The second was added after it was
+confirmed on real hardware — the protocol turned out to be the same.
+Other ids are deliberately left out until somebody confirms them the
+same way.
 
-**What has not:** whether the window comes up, whether the tray icon is
-picked up, whether the screen is found on the port, and how the icons
-look without the Windows icon font. There is no Linux machine here, so
-these can only be checked on a real one.
+**Still unconfirmed by anybody:** the graphics-card load, memory and
+power readings from `/sys/class/drm` (the parsing is checked against
+fabricated files, never against a real card); autostart after a reboot;
+and the shortcut in the applications menu. If you can check any of
+those, please say so in [issue #1][issue1].
 
-If you run it on Linux, please open an issue with what broke — that is
-exactly what is missing.
+Run `python проверки/linux.py` to see the parsing checks.
+
+[issue1]: https://github.com/knec14-sketch/EOne-Screen/issues/1
 
 ---
 

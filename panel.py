@@ -47,7 +47,7 @@ import prefs
 AUTHOR = "EOne"
 PROJECT = "EOne screen"
 LICENSE = "CC BY-NC-SA 4.0, некоммерческое использование"
-VERSION = "3.8"
+VERSION = "2.1"
 
 DEFAULT_LAYOUT = "layout.json"
 

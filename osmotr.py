@@ -56,6 +56,11 @@ BIBLIOTEKI = [
     ("pystray", "pystray", "значок рядом с часами", False),
 ]
 
+# Мост в библиотеку датчиков нужен только Windows. На Linux температуры
+# отдаёт ядро, и просить поставить pythonnet там не за чем - он только
+# пугает человека красной строкой в осмотре.
+TOLKO_WINDOWS = {"clr"}
+
 # Что показывает панель и откуда это берётся
 VAZHNYE = [
     ("cpu_load", "загрузка процессора"),
@@ -127,6 +132,8 @@ def biblioteki():
     nahodki = [Nahodka(None, "Python {}.{}.{}".format(*sys.version_info[:3]))]
     net = []
     for imya, stavit, zachem, nuzhna in BIBLIOTEKI:
+        if imya in TOLKO_WINDOWS and not IS_WINDOWS:
+            continue
         if est_li(imya):
             nahodki.append(Nahodka(True, stavit or imya, zachem))
             continue
@@ -154,6 +161,16 @@ def razblokirovat(put):
 
 
 def prava():
+    """Есть ли права администратора и нужны ли они вообще.
+
+    Нужны только Windows и только ради температур: библиотека датчиков
+    без них отдаёт нули по всем ядрам. На Linux температуры выкладывает
+    само ядро, читать их может кто угодно, и требовать что-то от человека
+    там не за чем.
+    """
+    if not IS_WINDOWS:
+        return [Nahodka(None, "особых прав не нужно",
+                        "температуры читает ядро, оно их и так отдаёт")], True
     import sensors as sensors_mod
     admin = sensors_mod._check_admin()
     if admin:
@@ -306,23 +323,29 @@ def datchiki(zhdat=8.0, s=None):
         nahodki.append(Nahodka(
             False, "температура процессора",
             "источник открылся, но отдаёт нули",
-            "так бывает без прав администратора: запусти start.bat", True))
+            "так бывает без прав администратора: запусти start.bat"
+            if IS_WINDOWS else "", True))
     else:
         nahodki.append(Nahodka(
             False, "температура процессора",
             s.temp_note or "источник не найден",
-            "нужны права администратора и четыре .dll рядом", True))
+            "нужны права администратора и четыре .dll рядом" if IS_WINDOWS
+            else "ядро не выложило /sys/class/hwmon: посмотри, "
+                 "загружен ли модуль датчиков процессора", True))
     if s.gpu_source:
         nahodki.append(Nahodka(True, "видеокарта читается", s.gpu_source))
     elif s.gpu_note:
         nahodki.append(Nahodka(
             False, "видеокарта", s.gpu_note,
-            "положи System.Numerics.Vectors.dll рядом с программой", True))
+            "положи System.Numerics.Vectors.dll рядом с программой"
+            if IS_WINDOWS else "", True))
     else:
         nahodki.append(Nahodka(
             False, "видеокарта", "нет источника показаний",
             "для Nvidia хватит драйвера, для AMD и Intel нужна "
-            "библиотека датчиков и права", True))
+            "библиотека датчиков и права" if IS_WINDOWS
+            else "для Nvidia нужен nvidia-smi, для AMD - драйвер amdgpu "
+                 "в /sys/class/drm", True))
     if svoy:
         s.stop()
     return nahodki, s, est

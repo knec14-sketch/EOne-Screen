@@ -27,7 +27,14 @@ USE_RTS = False         # IOCTL_SERIAL_CLR_RTS
 
 # идентификатор устройства из настроек родной программы
 DEVICE_VID = 0x33C3
-DEVICE_PID = 0x7788
+DEVICE_PID = 0x7788           # Jungle Leopard Pro Flow 360
+
+# Тот же контроллер стоит и в родственных помпах, отличается только
+# вторым числом. 7792 (панель HONGTAI, Flow 240) проверен на живой
+# машине: протокол не менялся вовсе, экран принял кадры как свой.
+# Новое число сюда дописывать только после такой же проверки - на слово
+# верить нечему, разъём один, а начинка может быть любая.
+DEVICE_PIDS = (0x7788, 0x7792)
 
 # --- протокол ---------------------------------------------------------------
 # Команда: 55 AA | длина (2 байта) | код | данные | сумма (2 байта)
@@ -93,13 +100,26 @@ def _need_pil():
         raise ImportError("не установлена библиотека Pillow. Выполни: pip install pyserial pillow")
 
 
+def nash_li(p):
+    """Наш ли это экран. p - то, что отдаёт list_ports."""
+    return p.vid == DEVICE_VID and p.pid in DEVICE_PIDS
+
+
 def find_port():
     _need_serial()
     from serial.tools import list_ports as lp
     for p in lp.comports():
-        if p.vid == DEVICE_VID and p.pid == DEVICE_PID:
+        if nash_li(p):
             return p.device
     return None
+
+
+# Одно и то же гнездо называется по-разному: на Windows это COM-порт,
+# на Linux - /dev/ttyACM. Говорить человеку про COM там, где их нет,
+# значит посылать его искать несуществующее.
+LINUX = sys.platform.startswith("linux")
+IMYA_PORTOV = "устройств на /dev/ttyACM" if LINUX else "COM-портов"
+PRIMER_PORTA = "/dev/ttyACM0" if LINUX else "COM3"
 
 
 def list_ports():
@@ -107,13 +127,16 @@ def list_ports():
     from serial.tools import list_ports as lp
     ports = list(lp.comports())
     if not ports:
-        print("COM-портов не найдено вообще.")
+        print("{} не найдено вообще.".format(IMYA_PORTOV))
         print("Проверь кабель от помпы к разъёму USB на плате.")
+        if LINUX:
+            print("И проверь, что ты в группе доступа к порту: "
+                  "dialout в Debian и Ubuntu, uucp в Arch.")
         return
-    print("Найденные COM-порты:\n")
+    print("Найденные порты:\n")
     for p in ports:
-        mark = "  <-- наш экран" if (p.vid == DEVICE_VID and p.pid == DEVICE_PID) else ""
-        print("  {:<8} {}{}".format(p.device, p.description, mark))
+        mark = "  <-- наш экран" if nash_li(p) else ""
+        print("  {:<14} {}{}".format(p.device, p.description, mark))
         if p.vid is not None:
             print("           VID:PID = {:04X}:{:04X}".format(p.vid, p.pid))
     print()
@@ -492,11 +515,13 @@ def main():
     else:
         port = find_port()
         if port is None:
-            print("Не нашёл экран автоматически (искал VID {:04X}, PID {:04X}).\n"
-                  .format(DEVICE_VID, DEVICE_PID))
+            print("Не нашёл экран автоматически (искал VID {:04X}, PID {}).\n"
+                  .format(DEVICE_VID,
+                          " или ".join("{:04X}".format(x)
+                                       for x in DEVICE_PIDS)))
             list_ports()
-            print("Запусти ещё раз с номером порта, например:")
-            print("    python txw818.py COM3")
+            print("Запусти ещё раз с портом первым словом, например:")
+            print("    python txw818.py {}".format(PRIMER_PORTA))
             return
         print("Экран найден на порту {}.".format(port))
 

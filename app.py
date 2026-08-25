@@ -37,13 +37,16 @@ import pages as pages_mod
 import panel as panel_mod
 import prefs
 import sensors as sensors_mod
+import sistema
 import themes as themes_mod
 import yazyk
 from yazyk import t
 
 AUTHOR = "EOne"
 PROJECT = "EOne screen"
-VERSION = "2.0"
+# Версия у программы одна и лежит в panel.py: её показывает и окно,
+# и консоль. Второй, своей, здесь больше нет - две расходились.
+VERSION = panel_mod.VERSION
 
 # Что написано в полосе заголовка окна. Имя программы стоит в шапке,
 # рядом с капелькой, и повторять его сверху незачем - там полезнее
@@ -439,18 +442,37 @@ class App:
     # --- значок возле часов ----------------------------------------------
 
     def _start_tray(self):
+        # На Linux надо сперва выбрать, на чём значок рисовать: pystray
+        # смотрит на PYSTRAY_BACKEND только при загрузке. Сам он идёт
+        # по порядку appindicator - gtk - xorg, а нам надо перескочить
+        # через gtk: его значок на Wayland просто не показывается.
+        nazvali = sistema.podgotovit_trey()
         try:
             import pystray
         except ImportError:
-            self.icon = None
-            return
+            # Назвали подложку, а она не встала. Отступаем к его
+            # собственному выбору: значок с переведённым заголовком
+            # лучше, чем никакого.
+            if not sistema.otstupit_s_treya(nazvali):
+                self.icon = None
+                return
+            try:
+                import pystray
+            except ImportError:
+                self.icon = None
+                return
+        # Что у него вышло на самом деле - от этого зависит, выдержит ли
+        # заголовок русские буквы.
+        podlozhka = sistema.podlozhka_treya(pystray)
 
         def title(_=None):
             if self.running():
-                return t("{} — {} ({:.1f} кадр/с, {})").format(
+                gotovo = t("{} — {} ({:.1f} кадр/с, {})").format(
                     PROJECT, t(self.runner.status), self.runner.fps_real,
                     t(panel_mod.DAY_MODE_NAMES.get(self.day_mode, "")))
-            return t("{} — экран выключен").format(PROJECT)
+            else:
+                gotovo = t("{} — экран выключен").format(PROJECT)
+            return sistema.bezopasnyy_zagolovok(gotovo, podlozhka)
 
         self._tray_title = title
 
@@ -487,9 +509,24 @@ class App:
             pystray.MenuItem(t("Показать окно"), later(self.show_window)),
             pystray.MenuItem(t("Выход"), quit_all),
         )
-        self.icon = pystray.Icon("eone_screen", panel_mod.make_icon(),
-                                 title(), menu)
-        threading.Thread(target=self.icon.run, daemon=True).start()
+        # Значок - удобство, а не условие работы. Раньше его беда роняла
+        # весь запуск: ни окна, ни экрана. Теперь беду показываем
+        # и живём дальше без значка - окно закрывается крестиком.
+        def krutit():
+            try:
+                self.icon.run()
+            except Exception as e:
+                self.icon = None
+                print("значок возле часов отвалился: {}".format(e))
+
+        try:
+            self.icon = pystray.Icon("eone_screen", panel_mod.make_icon(),
+                                     title(), menu)
+        except Exception as e:
+            self.icon = None
+            print("значок возле часов не завёлся: {}".format(e))
+            return
+        threading.Thread(target=krutit, daemon=True).start()
 
     def hide_window(self):
         if self.icon is None:

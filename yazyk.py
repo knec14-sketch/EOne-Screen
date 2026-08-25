@@ -274,6 +274,10 @@ SLOVAR = {
     "Опрос датчиков занимает несколько секунд.":
         "the same checks start.bat does before the first run. Polling the "
         "sensors takes a few seconds.",
+    "что на этой машине отвечает, а что молчит. "
+    "Опрос датчиков занимает несколько секунд.":
+        "what answers on this machine and what stays silent. Polling the "
+        "sensors takes a few seconds.",
     "Осмотреть": "Look it over",
     "  смотрю…": "  looking…",
     "Осмотр ещё не делался.": "It has not been looked over yet.",
@@ -376,6 +380,8 @@ SLOVAR = {
     "Запускать вместе с Windows": "Start with Windows",
     "через app.bat, чтобы поднялись права на температуру":
         "through app.bat, so the temperature rights are raised",
+    "Запускать при входе в систему": "Start at login",
+    "записью .desktop в автозапуске": "by a .desktop file in autostart",
     "Открывать сразу свёрнутым в трей": "Start minimised to the tray",
     "окно не мешает, панель работает":
         "the window stays out of the way, the panel runs",
@@ -403,6 +409,9 @@ SLOVAR = {
     "через nvidia-smi": "through nvidia-smi",
     "Температуры": "Temperatures",
     "нужны права администратора": "administrator rights required",
+    "их отдаёт само ядро": "the kernel gives them out itself",
+    "через nvidia-smi или /sys/class/drm":
+        "through nvidia-smi or /sys/class/drm",
     "Погода, восход и закат": "Weather, sunrise and sunset",
     "нужен интернет": "internet required",
     "Место": "Place",
@@ -1149,6 +1158,28 @@ SLOVAR = {
         "needed for non-Nvidia cards — it is in place",
     "нужен, чтобы читать видеокарту не Nvidia":
         "needed to read a non-Nvidia graphics card",
+
+    # --- то, что говорится только на Linux ---
+    "особых прав не нужно": "no special rights are needed",
+    "температуры читает ядро, оно их и так отдаёт":
+        "the kernel reads the temperatures and gives them out anyway",
+    "температуры читает ядро, библиотека датчиков не нужна":
+        "the kernel reads the temperatures, no sensor library is needed",
+    "ядро Linux": "the Linux kernel",
+    "ядро Linux (drm)": "the Linux kernel (drm)",
+    "ядро не отдаёт температур: нет /sys/class/hwmon":
+        "the kernel gives out no temperatures: there is no /sys/class/hwmon",
+    "ядро не отдаёт показаний видеокарты: нет /sys/class/drm":
+        "the kernel gives out no graphics card readings: "
+        "there is no /sys/class/drm",
+    "ядро не выложило /sys/class/hwmon: посмотри, загружен ли модуль "
+    "датчиков процессора":
+        "the kernel laid out no /sys/class/hwmon: check whether the "
+        "processor sensor module is loaded",
+    "для Nvidia нужен nvidia-smi, для AMD - драйвер amdgpu "
+    "в /sys/class/drm":
+        "Nvidia needs nvidia-smi, AMD needs the amdgpu driver "
+        "in /sys/class/drm",
     "библиотеке не хватает файла System.Numerics.Vectors.dll — без него "
     "показаний видеокарты не будет. Возьми его из архива "
     "LibreHardwareMonitor":

@@ -30,6 +30,7 @@ import panel as panel_mod
 import papka
 import prefs
 import sensors as sensors_mod
+import sistema
 import themes as themes_mod
 import yazyk
 from yazyk import t
@@ -754,7 +755,9 @@ class SettingsPage(ttk.Frame):
                   style="Card.Sub.TLabel").pack(anchor="w")
         ttk.Label(b, text="те же проверки, что делает start.bat перед первым "
                           "запуском. Опрос датчиков занимает несколько "
-                          "секунд.",
+                          "секунд." if not sistema.LINUX else
+                          "что на этой машине отвечает, а что молчит. "
+                          "Опрос датчиков занимает несколько секунд.",
                   style="Card.Faint.TLabel", wraplength=620,
                   justify="left").pack(anchor="w", pady=(0, 10))
         ryad = ttk.Frame(b, style="Card.TFrame")
@@ -975,8 +978,12 @@ class SettingsPage(ttk.Frame):
         for key, label, hint in (
                 ("start.desktop_shortcut", "Ярлык на рабочем столе",
                  "чтобы запускать не из папки, а с рабочего стола"),
-                ("start.autostart", "Запускать вместе с Windows",
-                 "через app.bat, чтобы поднялись права на температуру"),
+                ("start.autostart",
+                 "Запускать вместе с Windows" if not sistema.LINUX
+                 else "Запускать при входе в систему",
+                 "через app.bat, чтобы поднялись права на температуру"
+                 if not sistema.LINUX
+                 else "записью .desktop в автозапуске"),
                 ("start.minimized", "Открывать сразу свёрнутым в трей",
                  "окно не мешает, панель работает"),
                 ("start.screen_on", "Сразу включать экран",
@@ -1041,9 +1048,12 @@ class SettingsPage(ttk.Frame):
         for key, label, hint, icon in (
                 ("system", "Процессор, память, диски, сеть",
                  "почти бесплатно", "chip"),
-                ("gpu", "Видеокарта", "через nvidia-smi", "screen"),
+                ("gpu", "Видеокарта",
+                 "через nvidia-smi" if not sistema.LINUX
+                 else "через nvidia-smi или /sys/class/drm", "screen"),
                 ("temps", "Температуры",
-                 "нужны права администратора", "thermo"),
+                 "нужны права администратора" if not sistema.LINUX
+                 else "их отдаёт само ядро", "thermo"),
                 ("weather", "Погода, восход и закат",
                  "нужен интернет", "water")):
             var = tk.BooleanVar(value=bool(prefs.get("sensors.%s.on" % key, True)))
