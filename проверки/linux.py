@@ -272,6 +272,27 @@ sverit("пометки «из интернета» не бывает",
        sistema.pometka_iz_interneta(__file__), False)
 
 
+print("\n=== короткое имя видеокарты из lspci ===")
+# lspci отвечает длинно и для машины. На панели такое упирается в край.
+for syroe, nado in (
+        ("Advanced Micro Devices, Inc. [AMD/ATI] Navi 31 "
+         "[Radeon RX 7900 XT/7900 XTX/7900 GRE/7900M] (rev cc)",
+         "Radeon RX 7900 XT"),
+        ("NVIDIA Corporation GA104 [GeForce RTX 3070] (rev a1)",
+         "GeForce RTX 3070"),
+        ("Intel Corporation AlderLake-S GT1 [UHD Graphics 730] (rev 0c)",
+         "UHD Graphics 730"),
+        ("Intel Corporation UHD Graphics 620 (rev 02)",
+         "UHD Graphics 620"),
+        # Кроме кодового имени кристалла ничего не сказано - берём его,
+        # но без канцелярии производителя и без обрезков скобок
+        ("Advanced Micro Devices, Inc. [AMD/ATI] Raphael (rev c9)",
+         "Raphael"),
+        ("", "")):
+    sverit(syroe[:44] or "пустая строка",
+           sistema.korotko_o_karte(syroe), nado)
+
+
 print("\n=== показания карты ложатся в ключи панели ===")
 # Разбор проверен выше. Здесь другое: те ли имена получит панель.
 # Ошибиться тут легко и незаметно - панель просто покажет прочерк.

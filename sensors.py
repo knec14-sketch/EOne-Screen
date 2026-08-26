@@ -39,6 +39,7 @@ except ImportError:
 
 # Датчики молчат на любом языке, кроме одного места: describe() пишет
 # для человека, и её показывают в окне и при осмотре машины.
+import yazyk
 from yazyk import t
 
 import edinicy
@@ -362,6 +363,80 @@ WMO_EN = {
     96: ("Storm", "Thunderstorm with hail"),
     99: ("Storm", "Severe thunderstorm with hail"),
 }
+
+# Сокращённые описания - для панели, где места мало.
+#
+# Между «Ясно» и «Переменная облачность» разница втрое, а место под
+# надписью одно. Мельчить шрифт до нечитаемого не годится, поэтому
+# длинные описания говорим короче: «перемен. облачность» читается так же,
+# а места занимает на четверть меньше. Здесь только те коды, где есть
+# что сокращать; для остальных берётся полное описание как есть.
+SOKRASHENO = {
+    1: "В осн. ясно",
+    2: "Перемен. облачность",
+    51: "Слаб. морось",
+    55: "Сильн. морось",
+    57: "Сильн. лед. морось",
+    61: "Неб. дождь",
+    65: "Сильн. дождь",
+    66: "Лед. дождь",
+    67: "Сильн. лед. дождь",
+    71: "Неб. снег",
+    75: "Сильн. снег",
+    80: "Неб. ливень",
+    82: "Сильн. ливень",
+    85: "Снеж. заряд",
+    86: "Сильн. снеж. заряд",
+    99: "Сильн. гроза с градом",
+}
+
+# По-английски сокращать почти нечего: там и полные описания короткие.
+# Здесь только те, что длиннее двадцати знаков.
+SOKRASHENO_EN = {
+    57: "Heavy freez. drizzle",
+    67: "Heavy freez. rain",
+    96: "Storm with hail",
+    99: "Severe storm with hail",
+}
+
+
+# Все языки разом: русский и английский лежат здесь, остальные приходят
+# из своих файлов (yazyk_es.py и прочие). Нет языка - берётся английский.
+POGODA_PO_YAZYKAM = dict(yazyk.POGODA_YAZYKI)
+POGODA_PO_YAZYKAM.update({"ru": WMO, "en": WMO_EN})
+
+SOKRASHENO_PO_YAZYKAM = dict(yazyk.SOKRASHENO_YAZYKI)
+SOKRASHENO_PO_YAZYKAM.update({"ru": SOKRASHENO, "en": SOKRASHENO_EN})
+
+
+def slova_pogody(kod, yaz):
+    """Коротко, полно и сокращённо для одного кода на одном языке."""
+    tabl = POGODA_PO_YAZYKAM.get(yaz) or WMO_EN
+    korotko, polno = tabl.get(int(kod)) or ("—", "no data")
+    sokr = (SOKRASHENO_PO_YAZYKAM.get(yaz) or {}).get(int(kod), polno)
+    return korotko, polno, sokr
+
+
+def slova_pogody_vse(kod, yaz):
+    """Слова погоды на ВСЕХ языках разом, готовые для снимка.
+
+    Тема вправе просить {weather_en} или {weather_de} прямо, поэтому
+    кладём все: их полтора десятка коротких строк, а выбирать язык
+    в момент показа иначе не из чего.
+    """
+    out = {}
+    for kod_yaz, _imya in yazyk.YAZYKI:
+        korotko, polno, sokr = slova_pogody(kod, kod_yaz)
+        out["weather_" + kod_yaz] = korotko
+        out["weather_full_" + kod_yaz] = polno
+        out["weather_fit_" + kod_yaz] = sokr
+    yaz = yazyk.razobrat(yaz, "ru")
+    out["weather_code"] = int(kod)
+    out["weather"] = out["weather_" + yaz]
+    out["weather_full"] = out["weather_full_" + yaz]
+    out["weather_fit"] = out["weather_fit_" + yaz]
+    return out
+
 
 WEATHER_CONF = "weather.json"
 
@@ -969,6 +1044,32 @@ def _weather_config():
     return conf
 
 
+def zapomnit_yazyk_pogody(code):
+    """Записать в weather.json, на каком языке подписывать погоду.
+
+    Отдельно от языка окна оно живёт по одной причине: погода уходит
+    на экран водянки, а не в окно, и переводит её не наш словарь,
+    а таблица WMO. Но выбирать язык дважды человек не должен - окно
+    зовёт это при каждой смене.
+    """
+    code = "en" if str(code).lower().startswith("en") else "ru"
+    path = os.path.join(papka.programma(), WEATHER_CONF)
+    try:
+        with open(path, encoding="utf-8") as f:
+            conf = json.load(f)
+    except Exception:
+        conf = {}
+    if conf.get("language") == code:
+        return code                     # уже такой, не трогаем файл
+    conf["language"] = code
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(conf, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass
+    return code
+
+
 def find_places(name, limit=6, language="ru"):
     """Найти город по названию. Ключ не нужен, сервис тот же, что и погода."""
     import urllib.parse, urllib.request
@@ -1493,8 +1594,17 @@ class Sensors:
             if temps:
                 self.all_temps = dict(temps)
                 best = min(temps, key=lambda n: (temp_priority(n), n))
-                found["cpu_temp"] = temps[best]
                 self.temp_sensor = best
+                # Ровный ноль на градуснике - это не ноль градусов,
+                # а молчание: без прав администратора библиотека отдаёт
+                # нули по всем ядрам. Осмотр машины это правило знает
+                # давно, а панель до сих пор рисовала красный «0°C»
+                # как настоящее показание. Лучше прочерк.
+                if temps[best] > 0:
+                    found["cpu_temp"] = temps[best]
+                elif not self.temp_note:
+                    self.temp_note = ("библиотека отдаёт нули по всем "
+                                      "ядрам: нет прав администратора")
             if "gpu_mem_used_mb" in found and "gpu_mem_total_mb" in found:
                 found["gpu_mem_used_gb"] = found["gpu_mem_used_mb"] / 1024.0
                 found["gpu_mem_total_gb"] = found["gpu_mem_total_mb"] / 1024.0
@@ -1617,7 +1727,9 @@ class Sensors:
                     if temp_priority(pick) <= 6:
                         best = temps[pick]
                         self.temp_sensor = pick
-                if best is not None:
+                # Тот же ровный ноль, что и у библиотеки напрямую:
+                # молчание, а не показание.
+                if best is not None and best > 0:
                     working = ns
                     self.has_lhm = True
                     self.temp_source = "через WMI"
@@ -1649,10 +1761,11 @@ class Sensors:
                 lang = str(json.load(f).get("language", "ru")).lower()
         except Exception:
             pass
-        table = WMO_EN if lang.startswith("en") else WMO
-        short, full = table.get(int(code), ("—", "нет данных"))
-        out = {"weather_code": int(code), "weather": short,
-               "weather_full": full}
+        # Заполняем языковые поля ВСЕ, а не одно. Тема вправе просить
+        # {weather_en} или {weather_de} прямо, и если выдуманная погода
+        # их не тронет, там останется прошлый настоящий прогноз:
+        # на панели будет «Ясно», а рядом Overcast.
+        out = slova_pogody_vse(code, lang)
         out.update(sky_parts(code))
         if temp is not None:
             out["weather_temp"] = float(temp)
@@ -1695,15 +1808,8 @@ class Sensors:
                 lang = str(conf.get("language", "ru")).lower()
                 short, full = ((short_en, full_en) if lang.startswith("en")
                                else (short_ru, full_ru))
-                vals.update({
-                    "weather": short,
-                    "weather_full": full,
-                    "weather_ru": short_ru,
-                    "weather_full_ru": full_ru,
-                    "weather_en": short_en,
-                    "weather_full_en": full_en,
-                    "weather_city": self.weather_city,
-                })
+                vals.update(slova_pogody_vse(code, lang))
+                vals["weather_city"] = self.weather_city
                 vals.update(sky_parts(code))
                 # Восход и закат отдают не все службы. Без них панель
                 # не знает, когда менять ночной вид на дневной, поэтому
@@ -1811,7 +1917,14 @@ class Sensors:
             rows.append(t("показания видеокарты: НЕТ — нет ни nvidia-smi, "
                           "ни LibreHardwareMonitorLib.dll"))
         if IS_WINDOWS:
-            if self.has_lhm:
+            # has_lhm значит «библиотека поднялась», а не «градусы есть»:
+            # она поднимается и ради видеокарты. Спрашиваем про сам
+            # градусник, иначе осмотр говорил «читается», показывая нули.
+            with self.lock:
+                gradusy_est = isinstance(self.data.get("cpu_temp"),
+                                         (int, float)) \
+                    and not isinstance(self.data.get("cpu_temp"), bool)
+            if self.has_lhm and gradusy_est:
                 kak = t(self.temp_source or "способ не указан")
                 if self.temp_extra:
                     kak += t(", вспомогательных сборок: {}").format(

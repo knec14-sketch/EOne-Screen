@@ -33,6 +33,7 @@ import time
 
 import prefs
 import sistema
+import yazyk
 
 IS_WINDOWS = sys.platform.startswith("win")
 
@@ -103,23 +104,98 @@ GRADUSY_KLYUCHI = (
 # отдаёт большинство служб, и так её понимают доли метели.
 VETER_KLYUCHI = ("weather_wind",)
 
-# Во что переводить километры в час и как это подписывать.
+# Во что переводить километры в час и как это подписывать: множитель,
+# обычная подпись и те языки, где она своя. Латиницей пишут одинаково -
+# km/h и m/s международные, - а по-русски надо своими буквами.
 VETER = {
-    "kmh": (1.0, "км/ч"),
-    "ms": (1.0 / 3.6, "м/с"),
-    "mph": (1.0 / 1.609344, "миль/ч"),
+    "kmh": (1.0, "km/h", {"ru": "км/ч"}),
+    "ms": (1.0 / 3.6, "m/s", {"ru": "м/с"}),
+    "mph": (1.0 / 1.609344, "mph", {"ru": "миль/ч"}),
 }
 
 # Подписи ветра, которые могут стоять в теме готовым текстом. Меняются
 # так же, как «°C»: тему писали один раз, а шкалу выбирает человек.
 VETER_PODPISI = ("км/ч", "km/h", "м/с", "m/s", "миль/ч", "mph")
 
-# Порядок чисел в дате: как записывают день, месяц и год.
+# Порядок чисел в дате: полная, короткая, словами, без года.
+# Без года нужна панели: «26.08» на весь экран читается издалека,
+# а год на корпусе водянки никому не нужен.
 PORYADKI = {
-    "dmy": ("%d.%m.%Y", "%d.%m.%y", "%d %B"),
-    "mdy": ("%m/%d/%Y", "%m/%d/%y", "%B %d"),
-    "ymd": ("%Y-%m-%d", "%y-%m-%d", "%B %d"),
+    "dmy": ("%d.%m.%Y", "%d.%m.%y", "%d %B", "%d.%m"),
+    "mdy": ("%m/%d/%Y", "%m/%d/%y", "%B %d", "%m/%d"),
+    "ymd": ("%Y-%m-%d", "%y-%m-%d", "%B %d", "%m-%d"),
 }
+
+# Дни и месяцы своими словами. Через strftime нельзя: он берёт язык
+# у системы, и на португальской машине выходило «terça» рядом с русской
+# погодой. Тема должна говорить на одном языке, своём.
+DNI_NEDELI = {
+    "ru": ("понедельник", "вторник", "среда", "четверг", "пятница",
+           "суббота", "воскресенье"),
+    "en": ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+           "Saturday", "Sunday"),
+    "es": ("lunes", "martes", "miércoles", "jueves", "viernes",
+           "sábado", "domingo"),
+    "de": ("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag",
+           "Samstag", "Sonntag"),
+    "fr": ("lundi", "mardi", "mercredi", "jeudi", "vendredi",
+           "samedi", "dimanche"),
+    # Полные португальские названия - «segunda-feira» и далее. На панели
+    # они вдвое длиннее прочих, поэтому берём короткую разговорную форму:
+    # так говорят и так пишут в календарях.
+    "pt": ("segunda", "terça", "quarta", "quinta", "sexta",
+           "sábado", "domingo"),
+    "it": ("lunedì", "martedì", "mercoledì", "giovedì", "venerdì",
+           "sabato", "domenica"),
+}
+# По-русски месяц при числе стоит в родительном: «26 августа».
+MESYACY = {
+    "ru": ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
+           "августа", "сентября", "октября", "ноября", "декабря"),
+    "en": ("January", "February", "March", "April", "May", "June", "July",
+           "August", "September", "October", "November", "December"),
+    "es": ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+           "agosto", "septiembre", "octubre", "noviembre", "diciembre"),
+    "de": ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+           "August", "September", "Oktober", "November", "Dezember"),
+    "fr": ("janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+           "août", "septembre", "octobre", "novembre", "décembre"),
+    "pt": ("janeiro", "fevereiro", "março", "abril", "maio", "junho",
+           "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"),
+    "it": ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+           "luglio", "agosto", "settembre", "ottobre", "novembre",
+           "dicembre"),
+}
+
+# Как в языке пишут число с месяцем. Порядок чисел человек выбирает
+# в настройках, а предлог и точка - свойство языка, а не выбора.
+DATA_SLOVAMI = {
+    "ru": "{den} {mesyac}",
+    "en": "{den} {mesyac}",
+    "es": "{den} de {mesyac}",
+    "de": "{den}. {mesyac}",
+    "fr": "{den} {mesyac}",
+    "pt": "{den} de {mesyac}",
+    "it": "{den} {mesyac}",
+}
+
+# Языки, где месяц может встать перед числом, если так выбрано
+# в настройках. В остальных порядок слов свой: «августа 26»
+# и «de agosto 26» не говорят нигде.
+MESYAC_MOZHET_VPERED = ("en",)
+
+
+# Между временем и AM/PM ставится узкий неразрывный пробел, а не обычный.
+# Причина не в правилах набора, хотя и по ним так: в рисованных шрифтах
+# вроде Project Space обычный пробел втрое шире буквы, и «5:10   PM»
+# разъезжается на полэкрана.
+UZKIY_PROBEL = " "
+
+
+def _yazyk_temy():
+    """Код языка темы. Нет для него таблицы - берём английскую."""
+    kod = yazyk.yazyk_temy()
+    return kod if kod in DNI_NEDELI else "en"
 
 
 def shkala():
@@ -154,8 +230,10 @@ def veter(v):
 
 
 def znak_vetra():
-    """Как подписывают ветер при выбранной мере."""
-    return VETER[shkala_vetra()][1]
+    """Как подписывают ветер при выбранной мере и на выбранном языке."""
+    kmh, obychno, osobye = VETER[shkala_vetra()]
+    # Подпись уходит на панель, а не в окно, поэтому язык - темы.
+    return osobye.get(_yazyk_temy(), obychno)
 
 
 def dvenadcat():
@@ -165,20 +243,43 @@ def dvenadcat():
 
 
 def chasy(dt, sekundy=False):
-    """Время в выбранном виде."""
+    """Время в выбранном виде.
+
+    На двенадцати часах ведущий ноль снимаем: «4:46 PM», а не «04:46 PM» -
+    так пишут везде, где так считают, и на экране это шире без нужды.
+    """
     if dvenadcat():
-        return dt.strftime("%I:%M:%S %p" if sekundy else "%I:%M %p")
+        chas = dt.hour % 12 or 12
+        hvost = dt.strftime(":%M:%S" if sekundy else ":%M")
+        return "{}{}{}{}".format(chas, hvost, UZKIY_PROBEL, dt.strftime("%p"))
     return dt.strftime("%H:%M:%S" if sekundy else "%H:%M")
 
 
-def data(dt, korotko=False, slovami=False):
-    """Дата в выбранном порядке чисел."""
-    dlinnaya, korotkaya, mesyacem = PORYADKI.get(
+def data(dt, korotko=False, slovami=False, bez_goda=False):
+    """Дата в выбранном порядке чисел.
+
+    Месяц словами берём из своей таблицы, а не из strftime: тот пишет
+    на языке системы, и получалось «26 agosto» под русской погодой.
+    """
+    dlinnaya, korotkaya, mesyacem, dm = PORYADKI.get(
         str(_vybor("date", prefs.get("units.date", "system"))).lower(),
         PORYADKI["dmy"])
     if slovami:
-        return dt.strftime(mesyacem)
+        yaz = _yazyk_temy()
+        mesyac = MESYACY[yaz][dt.month - 1]
+        # Месяц вперёд числа встаёт только там, где так говорят,
+        # и только если так выбрано в настройках.
+        if yaz in MESYAC_MOZHET_VPERED and not mesyacem.startswith("%d"):
+            return "{} {}".format(mesyac, dt.day)
+        return DATA_SLOVAMI[yaz].format(den=dt.day, mesyac=mesyac)
+    if bez_goda:
+        return dt.strftime(dm)
     return dt.strftime(korotkaya if korotko else dlinnaya)
+
+
+def den_slovom(dt):
+    """Название дня недели на языке темы."""
+    return DNI_NEDELI[_yazyk_temy()][dt.weekday()]
 
 
 def s_voskresenya():
@@ -211,10 +312,21 @@ def dobavit(snap):
     snap["date"] = data(now)
     snap["date_short"] = data(now, korotko=True)
     snap["date_words"] = data(now, slovami=True)
-    snap["weekday"] = now.strftime("%A")
+    # Без года: панели он не нужен, а место занимает.
+    snap["date_dm"] = data(now, bez_goda=True)
+    snap["weekday"] = den_slovom(now)
     snap["day_index"] = den_nedeli(now)
     snap["deg"] = znak()
     snap["wind_unit"] = znak_vetra()
+    # Слова погоды приходят из таблицы WMO сразу на двух языках. Какое
+    # показать, решаем ЗДЕСЬ, а не при запросе прогноза: язык темы
+    # переключается мгновенно, а следующего прогноза ждать четверть часа,
+    # и без сети его можно не дождаться вовсе.
+    yaz = yazyk.yazyk_temy()
+    for klyuch in ("weather", "weather_full", "weather_fit"):
+        gotovo = snap.get(klyuch + "_" + yaz) or snap.get(klyuch + "_en")
+        if gotovo:
+            snap[klyuch] = gotovo
     return snap
 
 
@@ -246,16 +358,19 @@ def podpis(shablon):
     Тему пишут один раз, в Цельсиях и километрах в час. Чтобы она
     не врала при других единицах, подпись меняем прямо в шаблоне:
     числа к этому времени уже переведены.
+
+    Ветер смотрим всегда, а не только при смене меры: подпись зависит
+    ещё и от языка, и «км/ч» в английской теме держалось до тех пор,
+    пока человек не переключит заодно и километры на мили.
     """
     if not isinstance(shablon, str):
         return shablon
     if shkala() != "c":
         shablon = shablon.replace("°C", "°F").replace("°c", "°f")
-    if shkala_vetra() != "kmh":
-        nado = znak_vetra()
-        for bylo in VETER_PODPISI:
-            if bylo != nado and bylo in shablon:
-                shablon = shablon.replace(bylo, nado)
+    nado = znak_vetra()
+    for bylo in VETER_PODPISI:
+        if bylo != nado and bylo in shablon:
+            shablon = shablon.replace(bylo, nado)
     return shablon
 
 

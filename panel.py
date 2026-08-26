@@ -42,14 +42,31 @@ except ImportError:
 
 import sensors as sensors_mod
 import edinicy
+import yazyk
 import prefs
 
 AUTHOR = "EOne"
 PROJECT = "EOne screen"
 LICENSE = "CC BY-NC-SA 4.0, некоммерческое использование"
-VERSION = "2.1"
+VERSION = "2.2"
 
 DEFAULT_LAYOUT = "layout.json"
+
+
+def imya_sloya(layer):
+    """Как назвать слой человеку, на языке окна.
+
+    Название слоя - часть темы, а не программы, и в словаре yazyk.py
+    его нет и быть не может: тему пишет кто угодно и как угодно.
+    Поэтому перевод лежит в самой теме, рядом: name, name_en, name_de
+    и так далее. Нет нужного - берём английский, нет и его - русское:
+    лучше чужой язык, чем пустота.
+    """
+    yaz = yazyk.yazyk_temy()
+    if yaz != yazyk.RU:
+        return (layer.get("name_" + yaz) or layer.get("name_en")
+                or layer.get("name") or "")
+    return layer.get("name") or ""
 
 # Как выбирается дневной или ночной вид. Порядок тот же, что и в окне.
 DAY_MODES = ["auto", "system", "night", "day"]
@@ -438,10 +455,49 @@ def draw_rect(canvas, layer, data, size, frame_no):
             d.rectangle(box, outline=outline, width=width)
 
 
+# Насколько ужимать надпись, которой велено влезть в отведённое место.
+# Ниже этого не опускаемся: мельче уже не читается с полуметра, а панель
+# висит на корпусе, и разглядывать её никто не будет.
+MELCHE_NEKUDA = 9
+
+_vmestili = {}
+
+
+def vmestit_shrift(tekst, imya, razmer, predel):
+    """Шрифт, которым надпись влезет в predel точек по ширине.
+
+    Уменьшаем, пока не влезет. Нужно там, где длина надписи не в нашей
+    власти: слова погоды бывают от «Ясно» до «Severe thunderstorm with
+    hail», а имя процессора у Intel вдвое длиннее, чем у AMD. Без этого
+    длинное просто уезжало за край экрана и обрезалось на полуслове.
+    """
+    klyuch = (tekst, imya, round(float(razmer), 2), int(predel))
+    gotovo = _vmestili.get(klyuch)
+    if gotovo is not None:
+        return gotovo
+    razmer = float(razmer)
+    shrift = load_font(imya, razmer)
+    while razmer > MELCHE_NEKUDA:
+        korobka = shrift.getbbox(tekst)
+        if korobka[2] - korobka[0] <= predel:
+            break
+        razmer -= 1
+        shrift = load_font(imya, razmer)
+    if len(_vmestili) > 4000:          # надписи меняются, память не резиновая
+        _vmestili.clear()
+    _vmestili[klyuch] = shrift
+    return shrift
+
+
 def draw_text(canvas, layer, data, size, frame_no):
     op = float(layer.get("opacity", 1.0))
     text = render_text(layer.get("text", ""), data)
-    font = load_font(layer.get("font"), layer.get("size", 24))
+    predel = layer.get("max_width")
+    if predel and text:
+        font = vmestit_shrift(text, layer.get("font"),
+                              layer.get("size", 24), int(predel))
+    else:
+        font = load_font(layer.get("font"), layer.get("size", 24))
     color = parse_color(layer.get("color", "#ffffff"), op) or (255, 255, 255, 255)
     x, y = int(layer.get("x", 0)), int(layer.get("y", 0))
     anchor = layer.get("anchor", "la")
@@ -1882,7 +1938,8 @@ class Panel:
         # линии растягивались через весь экран, а звёзды выворачивались:
         # начало умножалось на k, а конец оставался как был.
         for key in ("x", "y", "x2", "y2", "w", "h", "r", "r_inner", "radius",
-                    "thickness", "head", "size", "width", "outline_width"):
+                    "thickness", "head", "size", "width", "outline_width",
+                    "max_width"):
             if isinstance(out.get(key), (int, float)):
                 out[key] = out[key] * k
         if isinstance(out.get("shadow"), dict):
@@ -2233,7 +2290,7 @@ def main():
 
     names = []
     for l in panel.layers:
-        n = l.get("name") or l.get("type", "?")
+        n = imya_sloya(l) or l.get("type", "?")
         if l.get("type") == "image":
             s = l.get("src", "")
             n += " [{}]".format(s if os.path.exists(panel.resolve(s))

@@ -131,7 +131,9 @@ TEXT_PRESETS = [
     ("Weather full and temperature",
      "{weather_full_en}   {weather_temp:.0f} °C"),
     ("Weather: feels like  10 °C", "feels like {weather_feels:.0f} °C"),
-    ("Weather: low and high  8…15 °C", "{weather_min:.0f}…{weather_max:.0f} °C"),
+    # Минимума и максимума в английском списке нет намеренно: там одни
+    # числа и знак градуса, слов никаких, и вторая такая же строка
+    # только двоила бы список.
     ("Weather: wind  4 km/h", "wind {weather_wind:.0f} km/h"),
     ("Weather: humidity  78 %", "humidity {weather_humidity:.0f} %"),
     ("Weather: everything", "{weather_city}  {weather_full_en}  {weather_temp:.0f} °C"),
@@ -239,6 +241,9 @@ HINTS = {
                 "и текст подставится сам.",
     "font": "Файл шрифта. Любой из системы или положенный рядом с темой.",
     "size": "Высота букв в точках.",
+    "max_width": "Влезть в столько точек по ширине. Длинная надпись сама "
+                 "уменьшится, короткая останется как есть. 0 — не ужимать, "
+                 "тогда длинное уедет за край.",
     "color": "Цвет букв.",
     "anchor": "За какую точку слой держится координатами. По центру — "
               "удобно для цифр, что меняют длину.",
@@ -278,8 +283,34 @@ HINTS = {
 }
 
 
+def nazvat_kopiey(l, zapasnoe):
+    """Дописать «копия» к названию слоя - на обоих языках сразу.
+
+    Иначе в английском окне копия и подлинник назывались бы одинаково:
+    приписка уходила в name, а в списке показывается name_en.
+    """
+    l["name"] = (l.get("name") or zapasnoe) + t(" копия")
+    if l.get("name_en"):
+        l["name_en"] = l["name_en"] + " copy"
+    return l
+
+
+def klyuch_imeni():
+    """В какое поле писать название слоя при нынешнем языке.
+
+    name и name_en - два равноправных перевода одной подписи. Правим
+    то, которое сейчас видно в списке: иначе переименование выглядело
+    бы холостым - правка ушла в одно поле, а показывается другое.
+    Второй язык не трогаем: стирать чужой перевод за человека нельзя.
+
+    Язык здесь - темы, а не окна: подпись принадлежит теме.
+    """
+    yaz = yazyk.yazyk_temy()
+    return "name" if yaz == yazyk.RU else "name_" + yaz
+
+
 def fields_for(kind):
-    common = [("name", "Название", "text"),
+    common = [(klyuch_imeni(), "Название", "text"),
               ("x", "X", "int"), ("y", "Y", "int"),
               ("angle", "Поворот, °", "float"),
               ("stretch_x", "Шире", "float"),
@@ -292,6 +323,7 @@ def fields_for(kind):
             ("__preset", "Готовая надпись", "preset"),
             ("text", "Текст", "text"),
             ("font", "Шрифт", "font"), ("size", "Размер", "int"),
+            ("max_width", "Влезть в ширину", "int"),
             ("color", "Цвет", "color"),
             ("anchor", "Держится за", "list:anchors"),
             ("outline", "Обводка", "color"),
@@ -374,7 +406,8 @@ GROUPS = [
                               "r_inner", "points", "turn", "thickness",
                               "radius", "angle", "stretch_x", "stretch_y",
                               "anchor"]),
-    ("Как выглядит", ["font", "size", "color", "fill", "fill2", "gradient",
+    ("Как выглядит", ["font", "size", "max_width", "color", "fill", "fill2",
+                      "gradient",
                       "back", "outline", "outline_width", "width", "opacity",
                       "direction", "gap_at", "gap", "reverse", "cap", "head"]),
 ]
@@ -924,7 +957,7 @@ class Editor:
             return
         self.remember("вставить")
         new = copy.deepcopy(layer)
-        new["name"] = (new.get("name") or t("слой")) + t(" копия")
+        nazvat_kopiey(new, t("слой"))
         new["x"] = int(new.get("x", 0) or 0) + 12
         new["y"] = int(new.get("y", 0) or 0) + 12
         at = min(self.sel + 1, len(self.layers))
@@ -981,7 +1014,7 @@ class Editor:
 
     # какие поля считаются размером у разных типов слоя
     SIZE_KEYS = ("w", "h", "r", "r_inner", "thickness", "size", "radius",
-                 "width", "outline_width", "head")
+                 "width", "outline_width", "head", "max_width")
 
     def resize(self, factor):
         """Изменить размер выбранных слоёв, сохранив их взаимное положение.
@@ -1042,8 +1075,11 @@ class Editor:
     def _passes(self, layer):
         """Проходит ли слой через поиск и фильтр."""
         if self.find_text:
-            hay = "{} {} {}".format(layer.get("name", ""), layer.get("type", ""),
-                                    layer.get("text", "")).lower()
+            # Ищем и по русскому названию, и по английскому: человек
+            # может помнить слой по тому языку, в котором его видел.
+            hay = "{} {} {} {}".format(
+                layer.get("name", ""), layer.get("name_en", ""),
+                layer.get("type", ""), layer.get("text", "")).lower()
             if self.find_text not in hay:
                 return False
         if self.find_when == "night":
@@ -1069,7 +1105,8 @@ class Editor:
             self.shown.append(i)
             mark = "× " if l.get("hidden") else "  "
             self.listbox.insert("end", "{}{:2d}. {}".format(
-                mark, i + 1, l.get("name") or l.get("type")))
+                mark, i + 1,
+                panel_mod.imya_sloya(l) or l.get("type")))
         if self.layers:
             self.sel = max(0, min(self.sel, len(self.layers) - 1))
             self.listbox.selection_clear(0, "end")
@@ -1125,7 +1162,7 @@ class Editor:
         if self.layers:
             self.remember("копия")
             c = copy.deepcopy(self.layers[self.sel])
-            c["name"] = (c.get("name") or t("блок")) + t(" копия")
+            nazvat_kopiey(c, t("блок"))
             c["x"] = int(c.get("x", 0) or 0) + 12
             c["y"] = int(c.get("y", 0) or 0) + 12
             self.layers.insert(self.sel + 1, c)
@@ -1137,7 +1174,8 @@ class Editor:
         if not picked:
             return
         what = (t("Удалить слой «{}»?").format(
-            self.layers[self.sel].get("name", t("слой"))) if len(picked) == 1
+            panel_mod.imya_sloya(self.layers[self.sel]) or t("слой"))
+            if len(picked) == 1
             else t("Удалить выбранные слои ({} шт.)?").format(len(picked)))
         if not messagebox.askyesno(t("Удалить"), what):
             return

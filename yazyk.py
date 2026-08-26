@@ -22,11 +22,40 @@ BUTTON_SAVE, а непереведённое просто остаётся ру�
 
 RU = "ru"
 EN = "en"
-YAZYKI = ((RU, "Русский"), (EN, "English"))
+ES = "es"
+DE = "de"
+PT = "pt"
+IT = "it"
+FR = "fr"
+
+# Каждый язык называет себя сам: искать «испанский» в русском списке
+# станет только тот, кто уже знает русский. Порядок - по тому, сколько
+# людей на них говорит, а русский первый потому, что он родной программе.
+YAZYKI = ((RU, "Русский"), (EN, "English"), (ES, "Español"),
+          (DE, "Deutsch"), (FR, "Français"), (PT, "Português"),
+          (IT, "Italiano"))
+
+# Язык темы можно держать отдельно от языка окна: окно - рабочее место
+# автора, а панель видят другие. «Как в окне» - обычный случай.
+KAK_V_OKNE = "system"
+YAZYKI_TEMY = ((KAK_V_OKNE, "Как в окне"),) + YAZYKI
 
 _teper = RU
+_tema = KAK_V_OKNE
 
 SLOVAR = {
+    # Готовые надписи, которые всегда по-английски:
+    # они просят {weather_en}, а не {weather}.
+    "Weather short  Rain": "Weather short, always English  Rain",
+    "Weather full  Light rain": "Weather full, always English  Light rain",
+    "Weather and temperature  Rain  12 °C": "Weather and temperature, always English  Rain  12 °C",
+    "Weather full and temperature": "Weather full and temperature, always English",
+    "Weather: feels like  10 °C": "Weather: feels like, always English  10 °C",
+    "Weather: wind  4 km/h": "Weather: wind, always English  4 km/h",
+    "Weather: humidity  78 %": "Weather: humidity, always English  78 %",
+    "Weather: everything": "Weather: everything, always English",
+    # Готовые надписи, которые всегда по-английски:
+    # они просят {weather_en}, а не {weather}.
     # --- каркас окна ---
     "Главная": "Home",
     "Темы": "Themes",
@@ -380,6 +409,12 @@ SLOVAR = {
     "Запускать вместе с Windows": "Start with Windows",
     "через app.bat, чтобы поднялись права на температуру":
         "through app.bat, so the temperature rights are raised",
+    "Язык темы": "Theme language",
+    "Как в окне": "Same as the window",
+    "на нём говорит панель на экране водянки: погода, подпись ветра, "
+    "названия слоёв в редакторе":
+        "the language the panel on the water-cooler screen speaks: the "
+        "weather, the wind unit, the layer names in the editor",
     "Запускать при входе в систему": "Start at login",
     "записью .desktop в автозапуске": "by a .desktop file in autostart",
     "Открывать сразу свёрнутым в трей": "Start minimised to the tray",
@@ -651,20 +686,20 @@ SLOVAR = {
     "Дата  2026-08-03": "Date  2026-08-03",
     "Дата  03 August": "Date  03 August",
     "День недели  Monday": "Weekday  Monday",
-    "Погода кратко  Дождь": "Weather short, in Russian",
-    "Погода подробно  Небольшой дождь": "Weather full, in Russian",
+    "Погода кратко  Дождь": "Weather short  Rain",
+    "Погода подробно  Небольшой дождь": "Weather full  Light rain",
     "Погода и температура  Дождь  12 °C":
-        "Weather and temperature, in Russian",
+        "Weather and temperature  Rain  12 °C",
     "Погода подробно и температура":
-        "Weather full and temperature, in Russian",
+        "Weather full and temperature",
     "Погода: только температура  12 °C": "Weather: temperature only  12 °C",
-    "Погода: ощущается как  10 °C": "Weather: feels like, in Russian",
+    "Погода: ощущается как  10 °C": "Weather: feels like  10 °C",
     # такой же шаблон есть и в английском ряду - подписи должны различаться
     "Погода: минимум и максимум  8…15 °C": "Weather: low and high, numbers only",
-    "Погода: ветер  4 км/ч": "Weather: wind, in Russian",
-    "Погода: влажность  78 %": "Weather: humidity, in Russian",
+    "Погода: ветер  4 км/ч": "Weather: wind  4 km/h",
+    "Погода: влажность  78 %": "Weather: humidity  78 %",
     "Погода: город и температура": "Weather: city and temperature",
-    "Погода: всё вместе": "Weather: everything, in Russian",
+    "Погода: всё вместе": "Weather: everything",
 
     # --- за какую точку держится слой ---
     "по центру": "centre",
@@ -770,6 +805,13 @@ SLOVAR = {
         "A font file. Any one from the system, or one placed next to the "
         "theme.",
     "Высота букв в точках.": "Letter height in points.",
+    "Влезть в ширину": "Fit into width",
+    "Влезть в столько точек по ширине. Длинная надпись сама уменьшится, "
+    "короткая останется как есть. 0 — не ужимать, тогда длинное уедет "
+    "за край.":
+        "Fit into this many points across. A long line shrinks itself, "
+        "a short one is left alone. 0 — do not shrink, and long text runs "
+        "off the edge.",
     "Цвет букв.": "Letter colour.",
     "За какую точку слой держится координатами. По центру — "
     "удобно для цифр, что меняют длину.":
@@ -1144,6 +1186,9 @@ SLOVAR = {
     "выбран датчик: ": "chosen sensor: ",
     "источник открылся, но отдаёт нули":
         "the source opened but gives out zeroes",
+    "библиотека отдаёт нули по всем ядрам: нет прав администратора":
+        "the library gives out zeroes on every core: "
+        "there are no administrator rights",
     "так бывает без прав администратора: запусти start.bat":
         "that happens without administrator rights: run start.bat",
     "источник не найден": "no source was found",
@@ -1300,15 +1345,84 @@ SLOVAR = {
 }
 
 
+def razobrat(code, zapas=RU):
+    """Код языка из чего угодно: «en», «en_US», «English», мусора.
+
+    Мусор превращается в zapas, а не в ошибку: настройки правят руками,
+    и из-за одной опечатки программа не должна отказываться открываться.
+    """
+    nizhe = str(code or "").lower().replace("-", "_")
+    for kod, _imya in YAZYKI:
+        if nizhe.startswith(kod):
+            return kod
+    return zapas
+
+
 def vybrat(code):
     """Выбрать язык окна."""
     global _teper
-    _teper = EN if str(code).lower().startswith("en") else RU
+    _teper = razobrat(code, RU)
     return _teper
 
 
+def vybrat_temu(code):
+    """Выбрать язык темы: «как в окне» или любой из списка."""
+    global _tema
+    nizhe = str(code or "").lower()
+    if not nizhe or nizhe.startswith(KAK_V_OKNE) or nizhe.startswith("как"):
+        _tema = KAK_V_OKNE
+    else:
+        _tema = razobrat(nizhe, KAK_V_OKNE)
+    return _tema
+
+
+def yazyk_temy():
+    """Код языка, на котором говорит тема сейчас.
+
+    Это НЕ язык окна. Слова, уходящие на экран водянки - погода,
+    подпись ветра, - и названия слоёв в теме идут за этим выбором,
+    а надписи самого окна - за языком окна.
+
+    «Как в окне» разворачивается здесь, а не хранится развёрнутым:
+    язык окна меняется на ходу, и тема обязана поспевать за ним.
+    """
+    return _teper if _tema == KAK_V_OKNE else _tema
+
+
+# Английский словарь лежит здесь же, остальные - каждый в своём файле:
+# yazyk_es.py, yazyk_de.py и так далее, по одному SLOVAR в каждом.
+# Так их можно дописывать по одному, не трогая ни этот файл, ни друг друга.
+# Нет файла - язык просто говорит по-английски, а не роняет программу.
+SLOVARI = {EN: SLOVAR}
+
+# Слова погоды и их сокращения тоже приходят оттуда: у языка всё своё
+# лежит в одном файле. Сами таблицы для русского и английского живут
+# в sensors.py, рядом с разбором прогноза, и подставляются там же.
+POGODA_YAZYKI = {}
+SOKRASHENO_YAZYKI = {}
+
+for _kod in (ES, DE, FR, PT, IT):
+    try:
+        _mod = __import__("yazyk_" + _kod)
+    except Exception:
+        continue
+    for _imya, _kuda in (("SLOVAR", SLOVARI), ("POGODA", POGODA_YAZYKI),
+                         ("SOKRASHENO", SOKRASHENO_YAZYKI)):
+        _tabl = getattr(_mod, _imya, None)
+        if isinstance(_tabl, dict) and _tabl:
+            _kuda[_kod] = _tabl
+
+
 def t(s):
-    """Строка на выбранном языке. Нет перевода - остаётся как была."""
+    """Строка на выбранном языке.
+
+    Нет перевода на выбранный - берём английский: он полон, и чужой
+    язык понятнее пустоты. Нет и его - остаётся русское.
+    """
     if _teper == RU or not isinstance(s, str):
         return s
-    return SLOVAR.get(s, s)
+    for yaz in (_teper, EN):
+        gotovo = SLOVARI.get(yaz, {}).get(s)
+        if gotovo:
+            return gotovo
+    return s

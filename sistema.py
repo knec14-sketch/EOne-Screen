@@ -40,6 +40,7 @@ Wayland, Intel i5-13600KF и Radeon RX 7900 XT. Отчёт - в issue #1.
 """
 
 import os
+import re
 import subprocess
 import sys
 
@@ -235,11 +236,49 @@ def imya_processora():
     return ""
 
 
+def korotko_o_karte(stroka):
+    """Короткое имя видеокарты из того, что написал lspci.
+
+    lspci отвечает длинно и для машины, а не для человека:
+
+        Advanced Micro Devices, Inc. [AMD/ATI] Navi 31 [Radeon RX 7900 XT/
+        7900 XTX/7900 GRE/7900M] (rev cc)
+
+    На панели такое не помещается и упирается в край экрана. Нам нужно
+    то, что написано на коробке, а оно лежит в ПОСЛЕДНИХ скобках.
+
+    Внутри скобок производитель перечисляет через косую черту все платы
+    на одном кристалле. Какая из них стоит в этой машине, lspci не знает,
+    и узнать неоткуда: имени платы ядро не выкладывает. Берём первую -
+    у владельца XTX прочтётся XT. Врать на одну букву неприятно, но
+    длинное имя не читается вовсе.
+    """
+    s = " ".join(str(stroka or "").split())
+    if not s:
+        return ""
+    s = re.sub(r"\s*\(rev [^)]*\)\s*$", "", s)       # (rev cc) - не имя
+    # [AMD/ATI] - это производитель, а не плата: коротко и без пробелов.
+    # Имя платы всегда длиннее и с пробелом внутри.
+    nazvaniya = [k for k in re.findall(r"\[([^\[\]]+)\]", s)
+                 if " " in k and len(k) > 8]
+    if nazvaniya:
+        return " ".join(nazvaniya[-1].split("/")[0].split())
+    # Скобок с именем платы нет - значит, кроме кодового имени кристалла,
+    # ничего и не сказано. Снимаем скобки производителя и его канцелярию,
+    # остальное оставляем как есть: пусть лучше кодовое имя, чем пусто.
+    s = re.sub(r"\s*\[[^\[\]]*\]\s*", " ", s)
+    for musor in ("Advanced Micro Devices, Inc.", "NVIDIA Corporation",
+                  "Intel Corporation", " Corporation", ", Inc.", " Inc."):
+        s = s.replace(musor, " ")
+    return " ".join(s.split())
+
+
 def imya_videokarty():
     """Название видеокарты на Linux. На Windows - None.
 
-    Сначала спрашиваем драйвер Nvidia - он отвечает точнее всех.
-    Нет его - смотрим, что вообще висит на шине.
+    Сначала спрашиваем драйвер Nvidia - он отвечает точнее всех
+    и сразу коротко. Нет его - смотрим, что висит на шине, и сокращаем
+    сами: см. korotko_o_karte.
     """
     if not LINUX:
         return None
@@ -250,7 +289,7 @@ def imya_videokarty():
     for stroka in _sprosit(["lspci"]).splitlines():
         nizhe = stroka.lower()
         if "vga compatible controller" in nizhe or "3d controller" in nizhe:
-            return stroka.split(":", 2)[-1].strip()
+            return korotko_o_karte(stroka.split(":", 2)[-1])
     return ""
 
 

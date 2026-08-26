@@ -3,12 +3,20 @@
 # EOne screen — an open replacement for the Jungle Leopard stock software
 
 An open replacement for the stock software of the **Jungle Leopard Pro
-Flow 360** water-cooler screen (TXW818 controller, ST7701S panel,
-960×480, over a COM port).
+Flow 360** and **Pro Flow 240** water-cooler screens (TXW818 controller,
+ST7701S panel, 960×480, over a COM port).
 
 The program draws a monitoring panel from a JSON description and pushes
 it to the screen as JPEG frames. Plus a window where all of it is set up:
 a theme gallery, a layer editor, sensors, weather.
+
+**Runs on Windows and on Linux.** Both have been used on real hardware —
+Linux on CachyOS with KDE Plasma 6 and Wayland, with the screen driven
+over `/dev/ttyACM0` at 30 frames a second.
+
+**Speaks seven languages:** Russian, English, Spanish, German, French,
+Portuguese and Italian. The window and the panel can speak different
+ones — the window is where you work, the panel is what other people see.
 
 ![Home page](snimki/home-night.png)
 
@@ -303,11 +311,29 @@ the sunrise is. You do not have to read somebody else's JSON by hand.
 
 ---
 
-## Language
+## Languages
 
-Russian and English, switched in the settings, applied on the next start.
-The dictionary key is the Russian string itself, so anything untranslated
-simply stays Russian and breaks nothing.
+Seven: Russian, English, Spanish, German, French, Portuguese, Italian.
+Switched in the settings, applied at once.
+
+**The window** and **the theme** have separate settings. The window is
+where you work; the panel hangs where other people see it, and the two
+may well need different languages. The theme setting governs everything
+that belongs to the theme — the weather words, the wind unit, the layer
+names in the editor — and defaults to following the window.
+
+Each language lives in its own file: `yazyk_es.py` and its kin, holding
+the window dictionary, the weather words and their abbreviations. The
+dictionary key is the Russian string itself, so a missing line falls back
+to English and then to Russian — a half-finished translation breaks
+nothing.
+
+> **The Spanish, German, French, Portuguese and Italian translations were
+> made with the help of AI and have not been checked by native speakers.**
+> Russian and English are the author's own. If you speak one of the five
+> and see something wrong or merely clumsy, please
+> [open an issue][issues] — a correction from someone who speaks the
+> language is worth more than any amount of careful machinery.
 
 ---
 

@@ -49,6 +49,30 @@ LICENSE_URL = {
 LICENSE_FILE = {"ru": "LICENSE", "en": "LICENSE.en"}
 
 
+def zapertet(okno, popytok=25):
+    """Запереть ввод на диалоге, не роняя его, если окно ещё не показано.
+
+    grab_set требует уже показанного окна. На X11 оно к этому мгновению
+    обычно готово, а на Wayland - нет, и Tk отвечает «grab failed: window
+    not viewable». Раньше это валило создание темы целиком.
+
+    Поэтому ждём, пока окно покажется, и только тогда запираем. Не
+    дождались за секунду - живём без запора: диалог всё равно работает,
+    просто позади него можно щёлкнуть.
+    """
+    def poprobovat(ostalos):
+        try:
+            if okno.winfo_viewable():
+                okno.grab_set()
+                return
+        except tk.TclError:
+            return                      # диалог закрыли, пока ждали
+        if ostalos > 0:
+            okno.after(40, lambda: poprobovat(ostalos - 1))
+
+    poprobovat(popytok)
+
+
 class ThemesPage(ttk.Frame):
     """Работа с темами: слева выбор занятия, справа витрина."""
 
@@ -409,7 +433,7 @@ class ThemesPage(ttk.Frame):
             return
         self.refresh()
         if messagebox.askyesno("Копия темы",
-                               "Готово:\n{}\n\nОткрыть копию?".format(
+                               t("Готово:\n{}\n\nОткрыть копию?").format(
                                    os.path.dirname(os.path.abspath(new)))):
             self.app.load_theme(new)
 
@@ -422,7 +446,7 @@ class ThemesPage(ttk.Frame):
             return
         if messagebox.askyesno(
                 "Картинка для показа",
-                "Готово:\n{}\n\nОткрыть её?".format(out)):
+                t("Готово:\n{}\n\nОткрыть её?").format(out)):
             try:
                 os.startfile(out)
             except Exception:
@@ -493,7 +517,7 @@ class MetaDialog(tk.Toplevel):
                    command=self.ok).pack(side="right")
         ttk.Button(row, text="Отмена", command=self.destroy).pack(side="right",
                                                                   padx=6)
-        self.grab_set()
+        zapertet(self)
 
     def ok(self):
         self.result = {k: v.get().strip() for k, v in self.vars.items()}
@@ -518,7 +542,7 @@ class Progress(tk.Toplevel):
         self.bar = ttk.Progressbar(body, length=380, maximum=100)
         self.bar.pack()
         self.protocol("WM_DELETE_WINDOW", lambda: None)
-        self.grab_set()
+        zapertet(self)
 
     def step(self, i, total, what=""):
         """Зовётся из рабочего потока, поэтому через after."""
@@ -570,7 +594,7 @@ def _ask(parent, look, title, question, default="", verb="Создать"):
     ttk.Button(row, text="Отмена", command=dlg.destroy).pack(side="right",
                                                              padx=6)
     entry.bind("<Return>", ok)
-    dlg.grab_set()
+    zapertet(dlg)
     parent.wait_window(dlg)
     return out.get("v")
 
@@ -724,16 +748,48 @@ class SettingsPage(ttk.Frame):
         card.pack(fill="x", pady=(14, 0))
         b = card.body
         ttk.Label(b, text="Язык", style="Card.Sub.TLabel").pack(anchor="w")
+        # Языков шесть, в одну строку они не влезают и уезжают за край
+        # окна вместе с последним - переносим по три.
         L.Segmented(b, lk, [(code, name, "about")
                             for code, name in yazyk.YAZYKI],
                     value=prefs.get("ui.lang", yazyk.RU),
-                    command=self._set_lang).pack(anchor="w", pady=(10, 0))
+                    command=self._set_lang,
+                    v_ryadu=3).pack(anchor="w", pady=(10, 0))
         self.lang_lbl = ttk.Label(b, text="", style="Card.Faint.TLabel")
         self.lang_lbl.pack(anchor="w", pady=(8, 0))
+
+        # Язык темы отдельно от языка окна: окно - рабочее место автора,
+        # а панель висит на виду, и говорить она может на другом языке.
+        # За этим выбором идут слова погоды, подпись ветра и названия
+        # слоёв - всё, что принадлежит теме, а не программе.
+        ttk.Label(b, text="Язык темы", style="Card.Sub.TLabel").pack(
+            anchor="w", pady=(18, 0))
+        ttk.Label(b, text="на нём говорит панель на экране водянки: погода, "
+                          "подпись ветра, названия слоёв в редакторе",
+                  style="Card.Faint.TLabel", wraplength=620,
+                  justify="left").pack(anchor="w", pady=(2, 0))
+        L.Segmented(b, lk, [(code, name, "about")
+                            for code, name in yazyk.YAZYKI_TEMY],
+                    value=prefs.get("ui.theme_lang", yazyk.KAK_V_OKNE),
+                    command=self._set_theme_lang,
+                    v_ryadu=4).pack(anchor="w", pady=(10, 0))
 
     def _set_lang(self, value):
         """Язык меняется сразу: окно пересобирается на новом языке."""
         self.app.smenit_yazyk(value)
+
+    def _set_theme_lang(self, value):
+        """Язык темы. Окно не пересобираем - меняется только то, что в теме."""
+        prefs.set("ui.theme_lang", value)
+        yazyk.vybrat_temu(value)
+        sensors_mod.zapomnit_yazyk_pogody(yazyk.yazyk_temy())
+        self.app.sensors.refresh_weather()
+        # Список слоёв в редакторе подписан по-старому - пусть перечитает
+        if getattr(self.app, "editor", None) is not None:
+            try:
+                self.app.editor._fill_list()
+            except Exception:
+                pass
 
     def _set_ui_theme(self, value):
         prefs.set("ui.theme", value)
@@ -1421,11 +1477,17 @@ class SettingsPage(ttk.Frame):
         threading.Thread(target=rabota, daemon=True).start()
 
     def _place_conf(self):
+        """Где сейчас смотрим погоду.
+
+        Путь берём у papka, а имя файла у sensors. Раньше папка считалась
+        от sensors.__file__: в собранном exe это временная папка
+        распаковки, и раздел уверял, что место не выбрано, когда оно
+        выбрано. Та же грабля, что и с settings.json.
+        """
         import json
         try:
-            with open(os.path.join(os.path.dirname(os.path.abspath(
-                    sensors_mod.__file__)), "weather.json"),
-                    encoding="utf-8") as f:
+            put = os.path.join(papka.programma(), sensors_mod.WEATHER_CONF)
+            with open(put, encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             return {}
@@ -1433,13 +1495,16 @@ class SettingsPage(ttk.Frame):
     def _show_place(self):
         conf = self._place_conf()
         if conf.get("latitude") is None:
-            self.city_now.configure(text="Место не выбрано — прогноза не будет, "
-                                         "а восход и закат возьмутся "
-                                         "запасные: 07:00 и 20:00.")
+            self.city_now.configure(
+                text=t("Место не выбрано — прогноза не будет, "
+                       "а восход и закат возьмутся запасные: "
+                       "07:00 и 20:00."))
             return
+        # Переводим ДО format: с подставленными числами строку
+        # в словаре уже не найти.
         self.city_now.configure(
-            text="Сейчас: {}   ({:.3f}, {:.3f})\n{}".format(
-                conf.get("city") or "без названия",
+            text=t("Сейчас: {}   ({:.3f}, {:.3f})\n{}").format(
+                t(conf.get("city") or "без названия"),
                 float(conf["latitude"]), float(conf["longitude"]),
                 self.app.sensors.describe().strip().splitlines()[-1].strip()))
 
@@ -1463,7 +1528,7 @@ class SettingsPage(ttk.Frame):
     def _show_found(self, got):
         self.city_list.delete(0, "end")
         if isinstance(got, Exception):
-            self.city_list.insert("end", "  не вышло: {}".format(str(got)[:60]))
+            self.city_list.insert("end", t("  не вышло: {}").format(str(got)[:60]))
             self.found = []
             return
         self.found = got

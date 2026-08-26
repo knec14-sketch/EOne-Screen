@@ -87,6 +87,11 @@ class App:
         self._place_window(root)
 
         yazyk.vybrat(prefs.get("ui.lang", "ru"))
+        yazyk.vybrat_temu(prefs.get("ui.theme_lang", yazyk.KAK_V_OKNE))
+        # Язык погоды раньше жил сам по себе и менялся только при выборе
+        # города, и никакая часть окна в него не писала. Держим его
+        # в согласии с языком темы при каждом запуске.
+        sensors_mod.zapomnit_yazyk_pogody(yazyk.yazyk_temy())
         # погоду можно было выключить в прошлый раз - помним это
         panel_mod.WEATHER_DAY = bool(prefs.get("view.weather_day", True))
         panel_mod.WEATHER_NIGHT = bool(prefs.get("view.weather_night", True))
@@ -237,6 +242,12 @@ class App:
             return
         prefs.set("ui.lang", code)
         yazyk.vybrat(code)
+        # Тема со значением «как в окне» только что поехала следом -
+        # значит и погода на панели должна поехать. Без толчка новые
+        # слова появились бы на экране только через четверть часа,
+        # к следующему запросу прогноза.
+        sensors_mod.zapomnit_yazyk_pogody(yazyk.yazyk_temy())
+        self.sensors.refresh_weather()
 
         # Несохранённые правки темы пережили бы пересборку только
         # на диске - спрашиваем, как с ними быть.

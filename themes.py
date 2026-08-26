@@ -33,6 +33,7 @@ import zipfile
 from PIL import Image, ImageDraw, ImageFont
 
 import panel as panel_mod
+import yazyk
 from yazyk import t
 
 THUMB_NAME = ".preview.png"
@@ -185,6 +186,21 @@ def _mentions(layers, needle):
     return False
 
 
+def _opisanie(meta):
+    """Описание темы на языке темы.
+
+    Описание пишет автор темы, а не мы, и в словарь программы оно
+    не попадает. Тема вправе носить его на всех языках сразу:
+    description, description_en, description_de и так далее.
+    """
+    yaz = yazyk.yazyk_temy()
+    if yaz != yazyk.RU:
+        gotovo = meta.get("description_" + yaz) or meta.get("description_en")
+        if gotovo:
+            return gotovo
+    return meta.get("description", "")
+
+
 def info(path):
     """Всё, что нужно карточке темы."""
     try:
@@ -204,7 +220,9 @@ def info(path):
         "meta": meta,
         "name": meta.get("name") or default_name,
         "author": meta.get("author", ""),
-        "description": meta.get("description", ""),
+        # Описание пишет автор темы, а не мы, и в словарь программы оно
+        # не попадает. Тема вправе носить его на двух языках рядом.
+        "description": _opisanie(meta),
         "abilities": abilities(cfg),
         "layers": len(cfg.get("layers", [])),
         "size": "{}x{}".format(scr.get("width", 960), scr.get("height", 480)),
@@ -302,10 +320,10 @@ def showcase(path, out_path=None, width=1200):
 
     y = pad + hh + 22
     d.text((pad, y), meta["name"], font=font(34, True), fill=(236, 240, 247))
-    line = "{} слоёв · {} · {:g} кадр/с".format(
+    line = t("{} слоёв · {} · {:g} кадр/с").format(
         meta["layers"], meta["size"], float(meta["fps"] or 1))
     if meta["author"]:
-        line = "автор: {}   ·   {}".format(meta["author"], line)
+        line = t("автор: {}   ·   {}").format(meta["author"], line)
     d.text((pad, y + 46), line, font=font(19), fill=(126, 137, 154))
     if meta["abilities"]:
         d.text((pad, y + 74), "   ·   ".join(a for a, _ in meta["abilities"]),

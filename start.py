@@ -321,11 +321,28 @@ def zapisat(prefs, zhelezo, s, est):
 
 # --- итог -------------------------------------------------------------------
 
+def _bez_povtorov(spisok):
+    """Убрать одинаковые строки, сохранив порядок."""
+    bylo, out = set(), []
+    for b in spisok:
+        if b[1] not in bylo:
+            bylo.add(b[1])
+            out.append(b)
+    return out
+
+
 def itog():
     zagolovok("Итог")
-    plohie = [b for b in bedy if b[0]]
-    melkie = [b for b in bedy if not b[0]]
-    if not bedy:
+    plohie = _bez_povtorov([b for b in bedy if b[0]])
+    # Одну и ту же беду находят разные проверки: и права, и опрос
+    # датчиков, и разбор источника температуры. В итоге «температура
+    # процессора» стояла трижды, да ещё в двух степенях важности разом.
+    # Оставляем её там, где она важнее.
+    vazhnoe = {b[1].split(":")[0].strip() for b in plohie}
+    melkie = _bez_povtorov([b for b in bedy if not b[0]
+                            and b[1].split(":")[0].strip() not in vazhnoe])
+    bedy_est = plohie or melkie
+    if not bedy_est:
         prosto("Всё на месте. Запускай app.bat.")
         return 0
     if plohie:

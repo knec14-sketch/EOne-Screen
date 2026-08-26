@@ -31,6 +31,7 @@ import time
 import edinicy
 import papka
 import sistema
+from yazyk import t
 
 IS_WINDOWS = sys.platform.startswith("win")
 BASE = papka.programma()
@@ -251,15 +252,15 @@ def zhelezo():
         svedeniya["cores"] = psutil.cpu_count(logical=False)
         svedeniya["threads"] = psutil.cpu_count(logical=True)
         svedeniya["ram_gb"] = psutil.virtual_memory().total / 1073741824.0
-        nahodki.append(Nahodka(None, "ядер {}, потоков {}".format(
+        nahodki.append(Nahodka(None, t("ядер {}, потоков {}").format(
             svedeniya["cores"], svedeniya["threads"])))
-        nahodki.append(Nahodka(None, "оперативной памяти {:.0f} ГБ".format(
+        nahodki.append(Nahodka(None, t("оперативной памяти {:.0f} ГБ").format(
             svedeniya["ram_gb"])))
     except Exception:
         pass
     disk = (os.environ.get("SystemDrive", "C:") + "\\") if IS_WINDOWS else "/"
     svedeniya["disk"] = disk
-    nahodki.append(Nahodka(None, "системный диск {}".format(disk)))
+    nahodki.append(Nahodka(None, t("системный диск {}").format(disk)))
     return nahodki, svedeniya
 
 
@@ -392,7 +393,7 @@ def pogoda(s):
         nahodki = [Nahodka(True, "прогноз получен", "{}, {}".format(
             s.weather_source or "?", s.weather_city or "?"))]
         if s.sunrise and s.sunset:
-            nahodki.append(Nahodka(None, "восход {}   закат {}".format(
+            nahodki.append(Nahodka(None, t("восход {}   закат {}").format(
                 s.sunrise.strftime("%H:%M"), s.sunset.strftime("%H:%M"))))
         return nahodki, True
     return [Nahodka(False, "прогноза нет",
